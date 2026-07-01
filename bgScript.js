@@ -4,24 +4,24 @@ const { createApp, ref, reactive, computed, onMounted } = Vue;
    THEME DEFINITIONS
    ============================================================ */
 const THEMES = {
-  pink:    { name: 'Pink',    emoji: '🌸', bg: '#fff0f5', surface: '#ffffff', text: '#4a2c3a', accent: '#e84393', accent2: '#fd79a8' },
-  blue:    { name: 'Blue',    emoji: '💙', bg: '#eef5ff', surface: '#ffffff', text: '#1e3a5f', accent: '#0984e3', accent2: '#74b9ff' },
-  purple:  { name: 'Purple',  emoji: '🟣', bg: '#f5f0ff', surface: '#ffffff', text: '#3a2c4a', accent: '#6c5ce7', accent2: '#a29bfe' },
-  dark:    { name: 'Dark',    emoji: '🌙', bg: '#1a1a2e', surface: '#16213e', text: '#e0e0e0', accent: '#e94560', accent2: '#533483' },
-  light:   { name: 'Light',   emoji: '☀️', bg: '#fafafa', surface: '#ffffff', text: '#2c2c2c', accent: '#00b894', accent2: '#55efc4' },
+  pink: { name: 'Pink', emoji: '🌸', bg: '#fff0f5', surface: '#ffffff', text: '#4a2c3a', accent: '#e84393', accent2: '#fd79a8' },
+  blue: { name: 'Blue', emoji: '💙', bg: '#eef5ff', surface: '#ffffff', text: '#1e3a5f', accent: '#0984e3', accent2: '#74b9ff' },
+  purple: { name: 'Purple', emoji: '🟣', bg: '#f5f0ff', surface: '#ffffff', text: '#3a2c4a', accent: '#6c5ce7', accent2: '#a29bfe' },
+  dark: { name: 'Dark', emoji: '🌙', bg: '#1a1a2e', surface: '#16213e', text: '#e0e0e0', accent: '#e94560', accent2: '#533483' },
+  light: { name: 'Light', emoji: '☀️', bg: '#fafafa', surface: '#ffffff', text: '#2c2c2c', accent: '#00b894', accent2: '#55efc4' },
   rainbow: { name: 'Rainbow', emoji: '🌈', bg: '#1a1a2e', surface: '#16213e', text: '#ffffff', accent: '#e84393', accent2: '#fdcb6e' },
-  gold:    { name: 'Gold',    emoji: '✨', bg: '#1a1a1a', surface: '#2c2c2c', text: '#f5d061', accent: '#d4af37', accent2: '#ffd700' },
-  red:     { name: 'Red',     emoji: '❤️', bg: '#fff0f0', surface: '#ffffff', text: '#5a1a1a', accent: '#e74c3c', accent2: '#ff7675' },
-  green:   { name: 'Green',   emoji: '💚', bg: '#f0faf0', surface: '#ffffff', text: '#1a3a1a', accent: '#27ae60', accent2: '#55efc4' },
+  gold: { name: 'Gold', emoji: '✨', bg: '#1a1a1a', surface: '#2c2c2c', text: '#f5d061', accent: '#d4af37', accent2: '#ffd700' },
+  red: { name: 'Red', emoji: '❤️', bg: '#fff0f0', surface: '#ffffff', text: '#5a1a1a', accent: '#e74c3c', accent2: '#ff7675' },
+  green: { name: 'Green', emoji: '💚', bg: '#f0faf0', surface: '#ffffff', text: '#1a3a1a', accent: '#27ae60', accent2: '#55efc4' },
 };
 
 /* ============================================================
    TEMPLATE DEFINITIONS
    ============================================================ */
 const TEMPLATES = {
-  cute:    { id: 'cute',    name: 'Cute',    emoji: '🎈', description: 'Pastel, rounded, playful', supportedThemes: ['pink','blue','purple','light','red','green'] },
-  elegant: { id: 'elegant', name: 'Elegant', emoji: '🥂', description: 'Minimal, white, gold, premium', supportedThemes: ['gold','light','dark','purple'] },
-  gaming:  { id: 'gaming',  name: 'Gaming',  emoji: '🎮', description: 'Dark mode, neon, pixel', supportedThemes: ['dark','purple','rainbow','blue'] },
+  cute: { id: 'cute', name: 'Cute', emoji: '🎈', description: 'Pastel, rounded, playful', supportedThemes: ['pink', 'blue', 'purple', 'light', 'red', 'green'] },
+  elegant: { id: 'elegant', name: 'Elegant', emoji: '🥂', description: 'Minimal, white, gold, premium', supportedThemes: ['gold', 'light', 'dark', 'purple'] },
+  gaming: { id: 'gaming', name: 'Gaming', emoji: '🎮', description: 'Dark mode, neon, pixel', supportedThemes: ['dark', 'purple', 'rainbow', 'blue'] },
 };
 
 /* ============================================================
@@ -305,59 +305,53 @@ body {
   generateJS(project, template) {
     let js = `
 // Birthday Website - Auto-generated script
-// Confetti animation
-(function() {
-  var colors = ['#e84393','#fdcb6e','#55efc4','#74b9ff','#a29bfe','#fd79a8','#d4af37'];
-  var layer = document.getElementById('confettiLayer');
-  if (!layer) return;
-
-  function spawnConfetti(count) {
-    for (var i = 0; i < count; i++) {
-      var piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.left = Math.random() * 100 + '%';
-      piece.style.top = -20 + 'px';
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.animationDuration = (2 + Math.random() * 3) + 's';
-      piece.style.animationDelay = (Math.random() * 2) + 's';
-      var size = 6 + Math.random() * 8;
-      piece.style.width = size + 'px';
-      piece.style.height = size + 'px';
-      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-      layer.appendChild(piece);
-      setTimeout(function(p) { return function() { p.remove(); }; }(piece), 6000);
-    }
-  }
-  spawnConfetti(50);
-  setInterval(function() { spawnConfetti(20); }, 3000);
-})();
-`;
-
-    // Gaming template: add button-click sound effect and easter egg
-    if (template.id === 'gaming') {
-      js += `
-// Gaming template easter egg
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    var pieces = document.querySelectorAll('.confetti-piece');
-    var layer = document.getElementById('confettiLayer');
+document.addEventListener("DOMContentLoaded", () => {
+    const colors = [ "#e84393", "#fdcb6e", "#55efc4", "#74b9ff", "#a29bfe", "#fd79a8", "#d4af37" ];
+    const layer = document.getElementById("confettiLayer");
     if (!layer) return;
-    for (var i = 0; i < 30; i++) {
-      var p = document.createElement('div');
-      p.className = 'confetti-piece';
-      p.style.left = Math.random() * 100 + '%';
-      p.style.background = ['#e94560','#533483','#f5d061','#e84393'][Math.floor(Math.random()*4)];
-      p.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-      var s = 8 + Math.random() * 10;
-      p.style.width = s + 'px'; p.style.height = s + 'px';
-      layer.appendChild(p);
-      (function(pp){ setTimeout(function(){ pp.remove(); }, 4000); })(p);
+    function spawnConfetti(count) {
+        for (let i = 0; i < count; i++) {
+            const piece = document.createElement("div");
+            piece.className = "confetti-piece";
+            piece.style.left = Math.random() * 100 + "%";
+            piece.style.top = "-20px";
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = (2 + Math.random() * 3) + "s";
+            piece.style.animationDelay = (Math.random() * 2) + "s";
+            const size = 6 + Math.random() * 8;
+            piece.style.width = size + "px";
+            piece.style.height = size + "px";
+            piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
+            layer.appendChild(piece);
+            setTimeout(() => { piece.remove(); }, 6000);
+        }
     }
-  }
+    spawnConfetti(50);
+    setInterval(() => { spawnConfetti(20); }, 3000);
+});
+`;
+    if (template.id === "gaming") {
+      js += `
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    const layer = document.getElementById("confettiLayer");
+    if (!layer) return;
+    const colors = [ "#e94560", "#533483", "#f5d061", "#e84393" ];
+    for (let i = 0; i < 30; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "%";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+        const size = 8 + Math.random() * 10;
+        piece.style.width = size + "px";
+        piece.style.height = size + "px";
+        layer.appendChild(piece);
+        setTimeout(() => { piece.remove(); }, 4000);
+    }
 });
 `;
     }
-
     return js;
   },
 
@@ -366,8 +360,8 @@ document.addEventListener('keydown', function(e) {
     const template = TEMPLATES[project.template] || TEMPLATES.cute;
 
     const html = this.generateHTML(project, theme, template);
-    const css  = this.generateCSS(project, theme, template);
-    const js   = this.generateJS(project, template);
+    const css = this.generateCSS(project, theme, template);
+    const js = this.generateJS(project, template);
 
     const zip = new JSZip();
     zip.file('BirthdayInd.html', html);
@@ -438,7 +432,7 @@ createApp({
       try {
         projects.value = await dbService.readAll();
         projects.value.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-      } catch(e) {
+      } catch (e) {
         showToast('Failed to load projects', 'error');
       } finally {
         loading.value = false;
@@ -581,7 +575,7 @@ createApp({
         if (!project) { showToast('Project not found', 'error'); loading.value = false; return; }
         await exportService.exportZIP(project);
         showToast('Exported successfully! Check your downloads.', 'success');
-      } catch(e) {
+      } catch (e) {
         showToast('Export failed: ' + e.message, 'error');
       } finally {
         loading.value = false;
@@ -603,7 +597,7 @@ createApp({
         showDeleteModal.value = false;
         deleteTarget.value = null;
         await loadProjects();
-      } catch(e) {
+      } catch (e) {
         showToast('Delete failed', 'error');
       } finally {
         loading.value = false;
@@ -621,8 +615,8 @@ createApp({
       const theme = THEMES[form.theme] || THEMES.pink;
       const template = TEMPLATES[form.template] || TEMPLATES.cute;
       const html = exportService.generateHTML(draftProject, theme, template);
-      const css  = exportService.generateCSS(draftProject, theme, template);
-      const js   = exportService.generateJS(draftProject, template);
+      const css = exportService.generateCSS(draftProject, theme, template);
+      const js = exportService.generateJS(draftProject, template);
 
       // Inline everything for live preview (no external files)
       let combined = html
@@ -644,8 +638,8 @@ createApp({
       const theme = THEMES[p.theme] || THEMES.pink;
       const template = TEMPLATES[p.template] || TEMPLATES.cute;
       const html = exportService.generateHTML(p, theme, template);
-      const css  = exportService.generateCSS(p, theme, template);
-      const js   = exportService.generateJS(p, template);
+      const css = exportService.generateCSS(p, theme, template);
+      const js = exportService.generateJS(p, template);
 
       let combined = html
         .replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
@@ -663,7 +657,7 @@ createApp({
       try {
         await dbService.init();
         await loadProjects();
-      } catch(e) {
+      } catch (e) {
         showToast('Failed to initialize database', 'error');
       }
     });
