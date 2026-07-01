@@ -364,9 +364,9 @@ document.addEventListener("keydown", (event) => {
     const js = this.generateJS(project, template);
 
     const zip = new JSZip();
-    zip.file('BirthdayInd.html', html);
-    zip.file('birthdayStyle.css', css);
-    zip.file('birthdayScr.js', js);
+    zip.file('index.html', html);
+    zip.file('style.css', css);
+    zip.file('script.js', js);
 
     // Add image if exists
     if (project.image) {
