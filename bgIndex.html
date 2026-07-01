@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Website Generator</title>
+<link rel="stylesheet" href="bgStyle.css">
+</head>
+<body>
+<div id="app">
+
+<!-- ===== HEADER ===== -->
+<header class="app-header" v-if="currentView !== 'preview-fullscreen'">
+  <h1><span class="logo">🎂</span> Birthday Website Generator</h1>
+  <div class="header-actions">
+    <button class="btn btn-secondary btn-sm" v-if="currentView !== 'dashboard'" @click="goDashboard">← Dashboard</button>
+    <button class="btn btn-primary btn-sm" v-if="currentView === 'dashboard'" @click="newProject">+ New Project</button>
+  </div>
+</header>
+
+<!-- ===== SPINNER ===== -->
+<div class="spinner-overlay" v-if="loading">
+  <div class="spinner"></div>
+  <p style="font-weight:600;color:var(--text-soft)">{{ loadingText }}</p>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="container" v-if="currentView === 'dashboard'">
+  <div class="dashboard-toolbar">
+    <h2>My Projects</h2>
+    <button class="btn btn-primary" @click="newProject">+ Create New</button>
+  </div>
+
+  <div v-if="projects.length === 0" class="empty-state">
+    <div class="icon">🎈</div>
+    <h3>No projects yet</h3>
+    <p>Click "Create New" to build your first birthday website.</p>
+  </div>
+
+  <div class="project-grid" v-else>
+    <div class="project-card" v-for="p in projects" :key="p.id">
+      <div class="card-thumb">
+        <img v-if="p.image" :src="p.image" :alt="p.name">
+        <span v-else>🎂</span>
+        <span class="card-badge">{{ p.template }}</span>
+      </div>
+      <div class="card-body">
+        <h3>{{ p.name }}</h3>
+        <p class="card-meta">📅 {{ p.birthdayDate || 'No date' }}</p>
+        <p class="card-meta">🎨 {{ p.theme }}</p>
+        <p class="card-meta">Edited: {{ formatDate(p.updatedAt) }}</p>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" @click="openProject(p.id)">Open</button>
+          <button class="btn btn-secondary btn-sm" @click="previewProject(p.id)">Preview</button>
+          <button class="btn btn-success btn-sm" @click="exportProject(p.id)">Export</button>
+          <button class="btn btn-danger btn-sm" @click="confirmDelete(p)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDITOR ===== -->
+<div class="container" v-if="currentView === 'editor'">
+  <div class="editor-layout">
+    <!-- Form -->
+    <div class="form-section">
+      <h2>{{ editingId ? 'Edit Project' : 'New Project' }}</h2>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input v-model="form.name" placeholder="Birthday person's name" @input="markDirty">
+      </div>
+
+      <div class="form-group">
+        <label>Birthday Date</label>
+        <input type="date" v-model="form.birthdayDate" @input="markDirty">
+      </div>
+
+      <div class="form-group">
+        <label>Custom Message</label>
+        <textarea v-model="form.message" placeholder="Write a heartfelt birthday message..." @input="markDirty"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Theme (colors)</label>
+        <div class="selector-grid">
+          <div class="selector-item" v-for="t in themes" :key="t.id"
+               :class="{active: form.theme === t.id}" @click="selectTheme(t.id)">
+            <span class="emoji">{{ t.emoji }}</span>
+            <span class="label">{{ t.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Template</label>
+        <div class="selector-grid">
+          <div class="selector-item" v-for="t in templates" :key="t.id"
+               :class="{active: form.template === t.id}" @click="selectTemplate(t.id)">
+            <span class="emoji">{{ t.emoji }}</span>
+            <span class="label">{{ t.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Image</label>
+        <div class="upload-area" @click="$refs.fileInput.click()">
+          <div class="icon">📷</div>
+          <p style="font-weight:600">Click to upload</p>
+          <p style="font-size:13px;color:var(--text-soft)">PNG, JPG up to ~2MB</p>
+          <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="handleImageUpload">
+        </div>
+        <div class="image-preview" v-if="form.image">
+          <img :src="form.image" alt="Preview">
+          <button class="btn btn-danger btn-sm" style="width:100%;border-radius:0 0 10px 10px" @click="removeImage">Remove</button>
+        </div>
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn btn-primary" @click="saveProject">💾 Save Project</button>
+        <button class="btn btn-secondary" @click="previewFromEditor">👁 Preview</button>
+        <button class="btn btn-success" @click="saveAndExport">⬇ Save & Export</button>
+      </div>
+    </div>
+
+    <!-- Live Preview -->
+    <div class="form-section">
+      <h2>Live Preview</h2>
+      <div class="preview-frame-wrapper" style="min-height:500px">
+        <iframe class="preview-frame" :srcdoc="livePreviewHtml"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PREVIEW ===== -->
+<div class="container" v-if="currentView === 'preview'">
+  <div class="preview-toolbar">
+    <h2 style="font-size:1.4rem">Preview: {{ previewProjectData?.name }}</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" @click="editFromPreview">✏ Edit</button>
+      <button class="btn btn-success btn-sm" @click="exportProject(previewProjectData?.id)">⬇ Export ZIP</button>
+    </div>
+  </div>
+  <div class="preview-frame-wrapper">
+    <iframe class="preview-frame" style="min-height:600px" :srcdoc="previewHtml"></iframe>
+  </div>
+</div>
+
+<!-- ===== DELETE MODAL ===== -->
+<div class="modal-overlay" v-if="showDeleteModal" @click.self="showDeleteModal = false">
+  <div class="modal">
+    <h3>🗑 Delete Project</h3>
+    <p>Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong>? This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" @click="showDeleteModal = false">Cancel</button>
+      <button class="btn btn-danger" @click="deleteProject">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOASTS ===== -->
+<div class="toast-container">
+  <div class="toast" v-for="t in toasts" :key="t.id" :class="t.type">
+    <span>{{ t.icon }}</span> <span>{{ t.message }}</span>
+  </div>
+</div>
+
+</div>
+
+<!-- ===== CDN SCRIPTS ===== -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="bgScript.js"></script>
+</body>
+</html>
