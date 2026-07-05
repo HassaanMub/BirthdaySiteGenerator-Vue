@@ -77,7 +77,33 @@ a { text-decoration: none; color: var(--accent); }
 .card-actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
 
 /* ===== EDITOR ===== */
-.editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+/* editor view spans the full screen; the live preview column gets the bigger share */
+.container.editor-container { max-width: none; }
+.editor-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 2fr) 3fr;
+  gap: 24px;
+  align-items: start;
+}
+/* live preview pinned in view at viewport height while the form scrolls */
+.preview-section {
+  position: sticky;
+  top: 86px;                       /* below the sticky app header */
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 110px);
+  min-height: 420px;
+}
+.preview-section .preview-frame-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.preview-section .preview-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
 .form-section { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
 .form-section h2 { font-size: 1.3rem; margin-bottom: 20px; }
 .form-group { margin-bottom: 18px; }
@@ -122,7 +148,27 @@ a { text-decoration: none; color: var(--accent); }
 .preview-frame-wrapper {
   background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden;
 }
-.preview-frame { width: 100%; min-height: 500px; border: none; }
+.preview-frame { width: 100%; border: none; }
+
+/* preview page: toolbar on top, iframe fills every remaining pixel */
+.container.preview-container {
+  max-width: none;
+  height: calc(100vh - 64px);      /* everything under the sticky app header */
+  height: calc(100dvh - 64px);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+.preview-container .preview-frame-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.preview-container .preview-frame {
+  flex: 1;
+  height: 100%;
+  min-height: 0 !important;
+}
 
 /* ===== MODALS ===== */
 .modal-overlay {
@@ -163,8 +209,14 @@ a { text-decoration: none; color: var(--accent); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .editor-layout { grid-template-columns: minmax(320px, 1fr) 1.4fr; gap: 16px; }
+}
 @media (max-width: 768px) {
   .editor-layout { grid-template-columns: 1fr; }
+  /* stacked: form first, preview un-pinned below at a comfortable height */
+  .preview-section { position: static; height: auto; }
+  .preview-section .preview-frame-wrapper { height: 70vh; }
   .container { padding: 16px 10px; }
   .app-header { padding: 12px 14px; }
   .app-header h1 { font-size: 1.05rem; }

@@ -1,2 +1,3 @@
 templates/*/*.html
 assets/testImages
+_*.html

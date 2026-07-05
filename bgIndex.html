@@ -61,7 +61,7 @@
 </div>
 
 <!-- ===== EDITOR ===== -->
-<div class="container" v-if="currentView === 'editor'">
+<div class="container editor-container" v-if="currentView === 'editor'">
   <div class="editor-layout">
     <!-- Form -->
     <div class="form-section">
@@ -126,9 +126,9 @@
     </div>
 
     <!-- Live Preview -->
-    <div class="form-section">
+    <div class="form-section preview-section">
       <h2>Live Preview</h2>
-      <div class="preview-frame-wrapper" style="min-height:500px">
+      <div class="preview-frame-wrapper">
         <iframe class="preview-frame" :srcdoc="livePreviewHtml"></iframe>
       </div>
     </div>
@@ -136,7 +136,7 @@
 </div>
 
 <!-- ===== PREVIEW ===== -->
-<div class="container" v-if="currentView === 'preview'">
+<div class="container preview-container" v-if="currentView === 'preview'">
   <div class="preview-toolbar">
     <h2 style="font-size:1.4rem">Preview: {{ previewProjectData?.name }}</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -145,7 +145,7 @@
     </div>
   </div>
   <div class="preview-frame-wrapper">
-    <iframe class="preview-frame" style="min-height:600px" :srcdoc="previewHtml"></iframe>
+    <iframe class="preview-frame" :srcdoc="previewHtml"></iframe>
   </div>
 </div>
 

@@ -1,27 +1,191 @@
-const { createApp, ref, reactive, computed, onMounted } = Vue;
+const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
 /* ============================================================
    THEME DEFINITIONS
+   Themes are plain JS objects. Their values replace the
+   {{PRIMARY}} / {{SECONDARY}} / {{BACKGROUND}} / {{SURFACE}} /
+   {{TEXT}} / {{ACCENT}} / {{GLOW}} placeholders inside templates.
    ============================================================ */
 const THEMES = {
-  pink: { name: 'Pink', emoji: '🌸', bg: '#fff0f5', surface: '#ffffff', text: '#4a2c3a', accent: '#e84393', accent2: '#fd79a8' },
-  blue: { name: 'Blue', emoji: '💙', bg: '#eef5ff', surface: '#ffffff', text: '#1e3a5f', accent: '#0984e3', accent2: '#74b9ff' },
-  purple: { name: 'Purple', emoji: '🟣', bg: '#f5f0ff', surface: '#ffffff', text: '#3a2c4a', accent: '#6c5ce7', accent2: '#a29bfe' },
-  dark: { name: 'Dark', emoji: '🌙', bg: '#1a1a2e', surface: '#16213e', text: '#e0e0e0', accent: '#e94560', accent2: '#533483' },
-  light: { name: 'Light', emoji: '☀️', bg: '#fafafa', surface: '#ffffff', text: '#2c2c2c', accent: '#00b894', accent2: '#55efc4' },
-  rainbow: { name: 'Rainbow', emoji: '🌈', bg: '#1a1a2e', surface: '#16213e', text: '#ffffff', accent: '#e84393', accent2: '#fdcb6e' },
-  gold: { name: 'Gold', emoji: '✨', bg: '#1a1a1a', surface: '#2c2c2c', text: '#f5d061', accent: '#d4af37', accent2: '#ffd700' },
-  red: { name: 'Red', emoji: '❤️', bg: '#fff0f0', surface: '#ffffff', text: '#5a1a1a', accent: '#e74c3c', accent2: '#ff7675' },
-  green: { name: 'Green', emoji: '💚', bg: '#f0faf0', surface: '#ffffff', text: '#1a3a1a', accent: '#27ae60', accent2: '#55efc4' },
+  // Special option: resolves to the selected template's original hardcoded
+  // palette (see TEMPLATE_DEFAULT_COLORS) instead of a fixed color set.
+  original: { name: 'Default Template Colors', emoji: '🎨', primary: '#ff5d73', secondary: '#ff8e72', accent: '#ffd166', background: '#ff6b81', surface: '#ffffff', text: '#333333' },
+  pink: { name: 'Pink', emoji: '🌸', primary: '#e84393', secondary: '#fd79a8', accent: '#fdcb6e', background: '#fff0f5', surface: '#ffffff', text: '#4a2c3a' },
+  blue: { name: 'Blue', emoji: '💙', primary: '#0984e3', secondary: '#74b9ff', accent: '#55efc4', background: '#eef5ff', surface: '#ffffff', text: '#1e3a5f' },
+  purple: { name: 'Purple', emoji: '🟣', primary: '#6c5ce7', secondary: '#a29bfe', accent: '#fd79a8', background: '#f5f0ff', surface: '#ffffff', text: '#3a2c4a' },
+  dark: { name: 'Dark', emoji: '🌙', primary: '#e94560', secondary: '#533483', accent: '#f5d061', background: '#1a1a2e', surface: '#16213e', text: '#e0e0e0' },
+  light: { name: 'Light', emoji: '☀️', primary: '#00b894', secondary: '#55efc4', accent: '#74b9ff', background: '#fafafa', surface: '#ffffff', text: '#2c2c2c' },
+  rainbow: { name: 'Rainbow', emoji: '🌈', primary: '#e84393', secondary: '#fdcb6e', accent: '#55efc4', background: '#1a1a2e', surface: '#16213e', text: '#ffffff' },
+  gold: { name: 'Gold', emoji: '✨', primary: '#d4af37', secondary: '#ffd700', accent: '#f5f6fa', background: '#1a1a1a', surface: '#2c2c2c', text: '#f5d061' },
+  red: { name: 'Red', emoji: '❤️', primary: '#e74c3c', secondary: '#ff7675', accent: '#fdcb6e', background: '#fff0f0', surface: '#ffffff', text: '#5a1a1a' },
+  green: { name: 'Green', emoji: '💚', primary: '#27ae60', secondary: '#55efc4', accent: '#fdcb6e', background: '#f0faf0', surface: '#ffffff', text: '#1a3a1a' },
 };
 
 /* ============================================================
    TEMPLATE DEFINITIONS
+   Each id maps to a self-contained file:
+   templates/<id>/<id>.html  (CSS + JS live inside the HTML).
+   To add a new template: create the folder + file, then
+   register it here. Nothing else needs to change.
    ============================================================ */
 const TEMPLATES = {
-  cute: { id: 'cute', name: 'Cute', emoji: '🎈', description: 'Pastel, rounded, playful', supportedThemes: ['pink', 'blue', 'purple', 'light', 'red', 'green'] },
-  elegant: { id: 'elegant', name: 'Elegant', emoji: '🥂', description: 'Minimal, white, gold, premium', supportedThemes: ['gold', 'light', 'dark', 'purple'] },
+  default: { id: 'default', name: 'Default', emoji: '🎈', description: 'Warm, playful, classic card', supportedThemes: ['pink', 'blue', 'purple', 'light', 'red', 'green'] },
+  glassy: { id: 'glassy', name: 'Glassy', emoji: '🫧', description: 'Frosted glass, bubbles, ambient light', supportedThemes: ['blue', 'purple', 'dark', 'light'] },
   gaming: { id: 'gaming', name: 'Gaming', emoji: '🎮', description: 'Dark mode, neon, pixel', supportedThemes: ['dark', 'purple', 'rainbow', 'blue'] },
+  romantic: { id: 'romantic', name: 'Romantic', emoji: '💌', description: 'Storybook with a click-to-open cover', supportedThemes: ['pink', 'red', 'purple', 'light'] },
+};
+
+// Projects saved before this architecture may reference old template ids
+const LEGACY_TEMPLATES = { cute: 'default', elegant: 'glassy' };
+
+const DEFAULT_TEMPLATE_ID = 'default';
+const DEFAULT_THEME_ID = 'pink';
+
+/* ============================================================
+   TEMPLATE LOADING + PLACEHOLDER REPLACEMENT
+   ============================================================ */
+
+// shown when a project has no uploaded photo
+const PLACEHOLDER_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+const templateService = {
+  resolveId(templateId) {
+    if (TEMPLATES[templateId]) return templateId;
+    if (LEGACY_TEMPLATES[templateId]) return LEGACY_TEMPLATES[templateId];
+    return DEFAULT_TEMPLATE_ID;
+  },
+
+  // Always fetched fresh so edits to template files show up
+  // on the next preview/export without restarting the app.
+  async load(templateId) {
+    const id = this.resolveId(templateId);
+    const url = 'templates/' + id + '/' + id + '.html';
+    let res;
+    try {
+      res = await fetch(url);
+    } catch (e) {
+      throw new Error('Could not fetch "' + url + '". Run the app from a local web server (e.g. VS Code Live Server) — template files cannot be loaded over file://');
+    }
+    if (!res.ok) throw new Error('Template file missing: ' + url + ' (HTTP ' + res.status + ')');
+    return res.text();
+  },
+};
+
+/* ============================================================
+   ORIGINAL TEMPLATE PALETTES
+   The exact colors each template shipped with before its :root
+   was tokenized — used by the "Default Template Colors" theme.
+   ============================================================ */
+const TEMPLATE_DEFAULT_COLORS = {
+  default: { primary: '#ff5d73', secondary: '#ff8e72', accent: '#ffd166', background: '#ff6b81', surface: '#ffffff', text: '#333333' },
+  glassy: { primary: '#5cc8ff', secondary: '#9ee8ff', accent: '#9ee8ff', background: '#0f1626', surface: '#ffffff', text: '#ffffff' },
+  gaming: { primary: '#a855f7', secondary: '#f472b6', accent: '#22d3ee', background: '#0b0518', surface: '#1e0f3c', text: '#f3f0ff' },
+  romantic: { primary: '#e63956', secondary: '#f7a8bc', accent: '#f7a8bc', background: '#ffe8ee', surface: '#ffffff', text: '#5c3a45', glow: '#ff3c5f' },
+};
+
+/*
+ * The "original" theme is template-dependent, so every theme lookup
+ * goes through here with the project's template id.
+ */
+function resolveTheme(themeId, templateId) {
+  if (themeId === 'original') {
+    const id = templateService.resolveId(templateId);
+    return TEMPLATE_DEFAULT_COLORS[id] || TEMPLATE_DEFAULT_COLORS.default;
+  }
+  return THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
+}
+
+function formatBirthdayDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+/**
+ * Replaces every {{PLACEHOLDER}} (spaces inside braces allowed) in a
+ * template with project data and theme colors. Unknown placeholders
+ * are left untouched so template authors can spot typos.
+ *
+ * options.imageSrc overrides what {{IMAGE}} becomes:
+ *   preview → base64 data URL, export → "assets/images/photo.png"
+ */
+function replacePlaceholders(content, project, theme, options = {}) {
+  const imageSrc = options.imageSrc !== undefined && options.imageSrc !== null && options.imageSrc !== ''
+    ? options.imageSrc
+    : (project.image || PLACEHOLDER_IMAGE);
+
+  const values = {
+    NAME: project.name || '',
+    MESSAGE: project.message || 'Wishing you the happiest of birthdays!',
+    DATE: formatBirthdayDate(project.birthdayDate),
+    TITLE: 'Happy Birthday ' + (project.name || '') + '!',
+    IMAGE: imageSrc,
+    PRIMARY: theme.primary,
+    SECONDARY: theme.secondary,
+    BACKGROUND: theme.background,
+    SURFACE: theme.surface,
+    TEXT: theme.text,
+    ACCENT: theme.accent || theme.secondary,
+    GLOW: theme.glow || theme.primary,
+  };
+
+  return content.replace(/\{\{\s*([A-Z0-9_]+)\s*\}\}/g, (match, key) =>
+    Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match
+  );
+}
+
+/*
+ * Templates live in templates/<id>/ and reference shared images as
+ * "../../assets/...". Previews render from the app root and exports
+ * put assets/ next to index.html, so both need the prefix flattened.
+ */
+function rewriteAssetPaths(html) {
+  return html.replaceAll('../../assets/', 'assets/');
+}
+
+/* ============================================================
+   EXPORT SERVICE - packs the processed template into a ZIP
+   ============================================================ */
+const exportService = {
+
+  async exportZIP(project) {
+    const theme = resolveTheme(project.theme, project.template);
+    const raw = await templateService.load(project.template);
+
+    let html = replacePlaceholders(raw, project, theme, {
+      imageSrc: project.image ? 'assets/images/photo.png' : PLACEHOLDER_IMAGE,
+    });
+
+    const zip = new JSZip();
+
+    // Bundle every shared asset the template references
+    // (decorative PNGs, background images, ...) so the exported
+    // site works standalone.
+    const assetPaths = [...new Set(
+      [...html.matchAll(/\.\.\/\.\.\/assets\/([^"')]+)/g)].map(m => m[1])
+    )];
+    for (const path of assetPaths) {
+      try {
+        const res = await fetch('assets/' + path);
+        if (res.ok) zip.file('assets/' + path, await res.blob());
+      } catch (e) {
+        console.warn('Skipping missing asset:', path);
+      }
+    }
+
+    html = rewriteAssetPaths(html);
+    zip.file('index.html', html);
+
+    if (project.image) {
+      const base64Data = project.image.split(',')[1] || project.image;
+      zip.folder('assets').folder('images').file('photo.png', base64Data, { base64: true });
+    }
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, 'BirthdayProject.zip');
+    return true;
+  },
 };
 
 /* ============================================================
@@ -102,286 +266,6 @@ const dbService = {
 };
 
 /* ============================================================
-   EXPORT SERVICE - generates static HTML/CSS/JS
-   ============================================================ */
-const exportService = {
-
-  generateHTML(project, theme, template) {
-    const imgTag = project.image
-      ? `<img src="assets/images/photo.jpg" alt="${project.name}" class="hero-image">`
-      : '';
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Happy Birthday ${project.name}!</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body class="template-${template.id} theme-${project.theme}">
-<div class="confetti-layer" id="confettiLayer"></div>
-<div class="container">
-  ${imgTag}
-  <h1 class="birthday-name">${project.name}</h1>
-  <p class="birthday-date">${project.birthdayDate || ''}</p>
-  <div class="message-box">
-    <p class="birthday-message">${project.message || 'Wishing you the happiest of birthdays!'}</p>
-  </div>
-  <div class="decorations">
-    <span class="deco">🎈</span><span class="deco">🎂</span><span class="deco">🎉</span>
-  </div>
-</div>
-<script src="script.js"><\/script>
-</body>
-</html>`;
-  },
-
-  generateCSS(project, theme, template) {
-    const t = theme;
-    const tpl = template.id;
-
-    // Shared base styles
-    let css = `
-:root {
-  --bg: ${t.bg};
-  --surface: ${t.surface};
-  --text: ${t.text};
-  --accent: ${t.accent};
-  --accent2: ${t.accent2};
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: var(--font, 'Segoe UI', sans-serif);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow-x: hidden;
-}
-.container {
-  text-align: center;
-  padding: 40px 24px;
-  max-width: 600px;
-  width: 100%;
-  z-index: 2;
-  position: relative;
-}
-.hero-image {
-  width: 180px;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 24px;
-  border: 5px solid var(--accent);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-}
-.birthday-name {
-  font-size: 2.8rem;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.birthday-date { font-size: 1.1rem; opacity: 0.7; margin-bottom: 24px; }
-.message-box {
-  background: var(--surface);
-  border-radius: 20px;
-  padding: 28px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-}
-.birthday-message { font-size: 1.15rem; line-height: 1.7; }
-.decorations { font-size: 2rem; display: flex; gap: 16px; justify-content: center; }
-.deco { animation: bounce 1.5s ease infinite; }
-.deco:nth-child(2) { animation-delay: 0.3s; }
-.deco:nth-child(3) { animation-delay: 0.6s; }
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-.confetti-layer {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 1; overflow: hidden;
-}
-.confetti-piece {
-  position: absolute; width: 10px; height: 10px; opacity: 0.8;
-  animation: confettiFall linear forwards;
-}
-@keyframes confettiFall {
-  to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-`;
-
-    // Template-specific overrides
-    if (tpl === 'cute') {
-      css += `
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; --font: 'Comic Sans MS'; }
-.hero-image { border-radius: 30px; border: 5px dashed var(--accent); }
-.message-box { border: 3px dashed var(--accent2); border-radius: 24px; }
-.birthday-name { font-size: 3rem; }
-.decorations { font-size: 2.5rem; }
-.container::before {
-  content: '🎁'; position: absolute; top: 10px; left: 20px; font-size: 2rem; opacity: 0.3;
-}
-.container::after {
-  content: '🎀'; position: absolute; bottom: 10px; right: 20px; font-size: 2rem; opacity: 0.3;
-}
-`;
-    } else if (tpl === 'elegant') {
-      css += `
-body { font-family: 'Georgia', 'Times New Roman', serif; --font: 'Georgia'; letter-spacing: 0.02em; }
-.birthday-name {
-  font-size: 2.4rem; font-weight: 400;
-  -webkit-text-fill-color: var(--accent);
-  background: none;
-}
-.hero-image { border-radius: 4px; border: 2px solid var(--accent); width: 200px; height: 200px; }
-.message-box {
-  border-radius: 4px; padding: 40px 32px;
-  border: 1px solid rgba(212,175,55,0.3);
-  background: var(--surface);
-}
-.birthday-message { font-size: 1.05rem; font-style: italic; }
-.decorations { display: none; }
-.birthday-date { text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.9rem; }
-.container { padding: 60px 24px; }
-`;
-    } else if (tpl === 'gaming') {
-      css += `
-body {
-  font-family: 'Courier New', monospace; --font: 'Courier New';
-  background: var(--bg);
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 30px 30px;
-}
-.birthday-name {
-  font-size: 3rem; text-transform: uppercase;
-  text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent2);
-  -webkit-text-fill-color: var(--accent);
-  background: none;
-  letter-spacing: 0.1em;
-}
-.hero-image {
-  border-radius: 0; border: 4px solid var(--accent);
-  box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent2);
-  image-rendering: pixelated;
-}
-.message-box {
-  border: 2px solid var(--accent); border-radius: 0;
-  background: rgba(0,0,0,0.3); box-shadow: 0 0 15px var(--accent);
-}
-.birthday-message { font-size: 1.1rem; text-shadow: 0 0 10px var(--accent2); }
-.decorations { font-size: 1.8rem; }
-.deco { filter: drop-shadow(0 0 8px var(--accent)); }
-.birthday-date { color: var(--accent2); text-transform: uppercase; letter-spacing: 0.15em; }
-`;
-    }
-
-    // Rainbow theme special: animated gradient background
-    if (project.theme === 'rainbow') {
-      css += `
-body {
-  background: linear-gradient(270deg, #e84393, #fdcb6e, #55efc4, #74b9ff, #a29bfe, #e84393);
-  background-size: 1200% 1200%;
-  animation: rainbowShift 8s ease infinite;
-}
-@keyframes rainbowShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-`;
-    }
-
-    return css;
-  },
-
-  generateJS(project, template) {
-    let js = `
-// Birthday Website - Auto-generated script
-document.addEventListener("DOMContentLoaded", () => {
-    const colors = [ "#e84393", "#fdcb6e", "#55efc4", "#74b9ff", "#a29bfe", "#fd79a8", "#d4af37" ];
-    const layer = document.getElementById("confettiLayer");
-    if (!layer) return;
-    function spawnConfetti(count) {
-        for (let i = 0; i < count; i++) {
-            const piece = document.createElement("div");
-            piece.className = "confetti-piece";
-            piece.style.left = Math.random() * 100 + "%";
-            piece.style.top = "-20px";
-            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.animationDuration = (2 + Math.random() * 3) + "s";
-            piece.style.animationDelay = (Math.random() * 2) + "s";
-            const size = 6 + Math.random() * 8;
-            piece.style.width = size + "px";
-            piece.style.height = size + "px";
-            piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
-            layer.appendChild(piece);
-            setTimeout(() => { piece.remove(); }, 6000);
-        }
-    }
-    spawnConfetti(50);
-    setInterval(() => { spawnConfetti(20); }, 3000);
-});
-`;
-    if (template.id === "gaming") {
-      js += `
-document.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter") return;
-    const layer = document.getElementById("confettiLayer");
-    if (!layer) return;
-    const colors = [ "#e94560", "#533483", "#f5d061", "#e84393" ];
-    for (let i = 0; i < 30; i++) {
-        const piece = document.createElement("div");
-        piece.className = "confetti-piece";
-        piece.style.left = Math.random() * 100 + "%";
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDuration = (1.5 + Math.random() * 2) + "s";
-        const size = 8 + Math.random() * 10;
-        piece.style.width = size + "px";
-        piece.style.height = size + "px";
-        layer.appendChild(piece);
-        setTimeout(() => { piece.remove(); }, 4000);
-    }
-});
-`;
-    }
-    return js;
-  },
-
-  async exportZIP(project) {
-    const theme = THEMES[project.theme] || THEMES.pink;
-    const template = TEMPLATES[project.template] || TEMPLATES.cute;
-
-    const html = this.generateHTML(project, theme, template);
-    const css = this.generateCSS(project, theme, template);
-    const js = this.generateJS(project, template);
-
-    const zip = new JSZip();
-    zip.file('index.html', html);
-    zip.file('style.css', css);
-    zip.file('script.js', js);
-
-    // Add image if exists
-    if (project.image) {
-      const base64Data = project.image.split(',')[1] || project.image;
-      const ext = project.image.includes('image/png') ? 'png' : 'jpg';
-      zip.folder('assets').folder('images').file('photo.' + ext, base64Data, { base64: true });
-    }
-
-    const blob = await zip.generateAsync({ type: 'blob' });
-    saveAs(blob, 'BirthdayProject.zip');
-    return true;
-  },
-};
-
-/* ============================================================
    VUE APP
    ============================================================ */
 createApp({
@@ -398,8 +282,8 @@ createApp({
     const previewProjectData = ref(null);
 
     const form = reactive({
-      name: '', birthdayDate: '', message: '', theme: 'pink',
-      template: 'cute', image: null,
+      name: '', birthdayDate: '', message: '', theme: DEFAULT_THEME_ID,
+      template: DEFAULT_TEMPLATE_ID, image: null,
     });
 
     const themes = Object.entries(THEMES).map(([id, t]) => ({ id, ...t }));
@@ -452,7 +336,7 @@ createApp({
     function newProject() {
       editingId.value = null;
       form.name = ''; form.birthdayDate = ''; form.message = '';
-      form.theme = 'pink'; form.template = 'cute'; form.image = null;
+      form.theme = DEFAULT_THEME_ID; form.template = DEFAULT_TEMPLATE_ID; form.image = null;
       isDirty.value = false;
       currentView.value = 'editor';
     }
@@ -465,7 +349,7 @@ createApp({
       editingId.value = id;
       form.name = p.name; form.birthdayDate = p.birthdayDate;
       form.message = p.message; form.theme = p.theme;
-      form.template = p.template; form.image = p.image;
+      form.template = templateService.resolveId(p.template); form.image = p.image;
       isDirty.value = false;
       currentView.value = 'editor';
     }
@@ -604,52 +488,54 @@ createApp({
       }
     }
 
+    /* ============================================================
+       PREVIEW - loads the real template file, replaces
+       placeholders, and feeds the result to the iframe srcdoc.
+       The template file is refetched only when the selected
+       template changes; typing just re-runs the string replace.
+       ============================================================ */
+    const editorTemplateHtml = ref('');
+    watch(() => form.template, async (id) => {
+      try {
+        const html = await templateService.load(id);
+        if (form.template !== id) return;   // a newer selection won the race
+        editorTemplateHtml.value = html;
+      } catch (e) {
+        if (form.template !== id) return;
+        editorTemplateHtml.value = '';
+        showToast(e.message, 'error');
+      }
+    }, { immediate: true });
+
     /* ---- Live Preview HTML (for editor iframe) ---- */
     const livePreviewHtml = computed(() => {
-      const draftProject = {
-        ...form,
-        id: 'live',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      const theme = THEMES[form.theme] || THEMES.pink;
-      const template = TEMPLATES[form.template] || TEMPLATES.cute;
-      const html = exportService.generateHTML(draftProject, theme, template);
-      const css = exportService.generateCSS(draftProject, theme, template);
-      const js = exportService.generateJS(draftProject, template);
-
-      // Inline everything for live preview (no external files)
-      let combined = html
-        .replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
-        .replace('<script src="script.js"><\/script>', '<script>' + js + '<\/script>');
-
-      // Replace image path with base64 data for live preview
-      if (form.image) {
-        combined = combined.replace('src="assets/images/photo.jpg"', 'src="' + form.image + '"');
-      }
-
-      return combined;
+      if (!editorTemplateHtml.value) return '';
+      const theme = resolveTheme(form.theme, form.template);
+      const html = replacePlaceholders(editorTemplateHtml.value, form, theme);
+      return rewriteAssetPaths(html);
     });
 
     /* ---- Preview page HTML ---- */
-    const previewHtml = computed(() => {
-      if (!previewProjectData.value) return '';
-      const p = previewProjectData.value;
-      const theme = THEMES[p.theme] || THEMES.pink;
-      const template = TEMPLATES[p.template] || TEMPLATES.cute;
-      const html = exportService.generateHTML(p, theme, template);
-      const css = exportService.generateCSS(p, theme, template);
-      const js = exportService.generateJS(p, template);
-
-      let combined = html
-        .replace('<link rel="stylesheet" href="style.css">', '<style>' + css + '</style>')
-        .replace('<script src="script.js"><\/script>', '<script>' + js + '<\/script>');
-
-      if (p.image) {
-        combined = combined.replace('src="assets/images/photo.jpg"', 'src="' + p.image + '"');
+    const previewTemplateHtml = ref('');
+    watch(previewProjectData, async (p) => {
+      if (!p) { previewTemplateHtml.value = ''; return; }
+      try {
+        const html = await templateService.load(p.template);
+        if (previewProjectData.value !== p) return;   // preview changed mid-fetch
+        previewTemplateHtml.value = html;
+      } catch (e) {
+        if (previewProjectData.value !== p) return;
+        previewTemplateHtml.value = '';
+        showToast(e.message, 'error');
       }
+    });
 
-      return combined;
+    const previewHtml = computed(() => {
+      const p = previewProjectData.value;
+      if (!p || !previewTemplateHtml.value) return '';
+      const theme = resolveTheme(p.theme, p.template);
+      const html = replacePlaceholders(previewTemplateHtml.value, p, theme);
+      return rewriteAssetPaths(html);
     });
 
     /* ---- Init ---- */
