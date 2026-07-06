@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ TITLE }}</title>
+    <style>
+        :root{
+            /* Core palette — the app's theme fills these in */
+            --main-color: {{ PRIMARY }};
+            --accent-color: {{ ACCENT }};
+            --text-color: #ffffff;   /* on-gradient text stays light */
+            --text-on-card: {{ TEXT }};
+            --card-color: {{ SURFACE }};
+            --message-bg: color-mix(in srgb, {{ SURFACE }} 94%, var(--main-color) 6%);
+            --message-border: var(--main-color);
+            --shadow: rgba(0,0,0,.28);
+            --background-1: var(--main-color);
+            --background-2: color-mix(in srgb, var(--main-color) 55%, var(--accent-color) 45%);
+            --background-3: var(--accent-color);
+        }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        body{
+            min-height:100vh;
+            overflow-x:hidden;
+            background:linear-gradient(
+                135deg,
+                var(--background-1),
+                var(--background-2),
+                var(--background-3)
+            );
+            position:relative;
+        }
+        .mainBody{
+            min-height:100vh;
+            display:flex;
+            justify-content:space-evenly;
+            align-items:center;
+            gap:60px;
+            padding:50px;
+            position:relative;
+            z-index:2;
+        }
+        .picBody, .detailBody{
+            flex:1;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .imageFrame{
+            width:min(430px,90vw);
+            aspect-ratio:4/5;
+            background:var(--card-color);
+            padding:20px;
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+            border-radius:10px;
+            transform: rotate(-10deg);
+            box-shadow:
+                18px 18px 30px var(--shadow);
+        }
+        .image{
+            width:100%;
+            height:82%;
+            object-fit:cover;
+            border-radius:8px;
+        }
+        .imageName{
+            font-size:1.3rem;
+            color:var(--text-on-card);
+            text-align:center;
+        }
+        .detailBody{
+            flex-direction:column;
+            gap:25px;
+            color:var(--text-color);
+            max-width:600px;
+            text-align:center;
+        }
+        .titleText{
+            font-size:clamp(1.5rem,1.8vw,5rem);
+            font-weight:bold;
+            line-height:1.2;
+            text-shadow:2px 2px 8px rgba(0,0,0,.25);
+        }
+        .messageBox{
+            width:100%;
+            background:var(--message-bg);
+            color:var(--text-on-card);
+            border-radius:25px;
+            border:3px solid var(--message-border);
+            padding:30px;
+            box-shadow:0 8px 20px rgba(0,0,0,.18);
+        }
+        .message{
+            font-size:1.1rem;
+            line-height:1.7;
+        }
+        .dateText{
+            font-size:1.25rem;
+            font-weight:bold;
+        }
+        /* Floating Decorations */
+        .decor{
+            position:absolute;
+            user-select:none;
+            pointer-events:none;
+            animation:float 5s ease-in-out infinite;
+            opacity:.85;
+        }
+        .decor.small{
+            font-size:2rem;
+        }
+        .decor.medium{
+            font-size:3rem;
+        }
+        .decor.large{
+            font-size:4rem;
+        }
+        @keyframes float{
+            0%{
+                transform:translateY(0px) rotate(0deg);
+            }
+            50%{
+                transform:translateY(-14px) rotate(5deg);
+            }
+            100%{
+                transform:translateY(0px) rotate(0deg);
+            }
+        }
+        @media(max-width:900px){
+            .mainBody{
+                flex-direction:column;
+                gap:50px;
+                padding:35px 20px;
+            }
+        }
+        @media (max-width:520px){
+            .imageFrame{
+                transform: none;
+            }
+        }
+        @media(max-width:500px){
+            .titleText{
+                font-size:2rem;
+            }
+            .message{
+                font-size:1rem;
+            }
+            .decor{
+                opacity:.55;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- Decorations -->
+    <div class="decor medium" style="top:40px; left:40px;">🌸</div>
+    <div class="decor large" style="top:70px; right:60px; animation-duration:6s;">🎈</div>
+    <div class="decor medium" style="bottom:40px; left:60px; animation-duration:4s;">🎂</div>
+    <div class="decor medium" style="bottom:50px; right:70px; animation-duration:7s;">🌹</div>
+    <div class="decor small" style="top:45%; left:8%; animation-duration:5s;">🕯️</div>
+    <div class="decor small" style="top:28%; right:10%; animation-duration:4.5s;">✨</div>
+    <div class="decor small" style="bottom:28%; right:18%; animation-duration:5.7s;">💖</div>
+    <div class="decor small" style="bottom:18%; left:25%; animation-duration:6.2s;">🎉</div>
+    <section class="mainBody">
+        <article class="picBody">
+            <div class="imageFrame">
+                <img src="{{ IMAGE }}" alt="{{ NAME }}" class="image">
+                <h3 class="imageName"> {{ NAME }} ❤️ </h3>
+            </div>
+        </article>
+        <article class="detailBody">
+            <h1 class="titleText">🎉 Happy Birthday {{ NAME }} 🎉</h1>
+            <div class="messageBox">
+                <p class="message">{{ MESSAGE }}</p>
+            </div>
+            <h3 class="dateText">📅 {{ DATE }}</h3>
+        </article>
+    </section>
+    <script>
+        // Give every decoration a random animation delay
+        document.querySelectorAll(".decor").forEach(item => {
+            item.style.animationDelay = (Math.random() * 2).toFixed(2) + "s";
+        });
+    </script>
+</body>
+</html>
