@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +9,7 @@
             /* Core palette — the app's theme fills these in */
             --main-color: {{ PRIMARY }};
             --accent-color: {{ ACCENT }};
-            --text-color: #ffffff;   /* glass panels sit on a dark photo overlay — text stays light */
+            --text-color: #ffffff;
             --text-muted: rgba(255, 255, 255, .72);
             --glass-bg: rgba(255, 255, 255, .07);
             --glass-bg-strong: rgba(255, 255, 255, .11);
@@ -25,18 +24,12 @@
             --ring-color: color-mix(in srgb, var(--accent-color) 60%, white 40%);
             --card-glow-shadow: 0 0 0 rgba(0, 0, 0, 0);
         }
-
-        * {
+        *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        html,
-        body {
-            height: 100%;
-        }
-
+        html, body {height: 100%;}
         body {
             position: relative;
             min-height: 100vh;
@@ -50,7 +43,6 @@
             justify-content: center;
             padding: 48px 24px;
         }
-
         body::before {
             content: "";
             position: fixed;
@@ -63,7 +55,6 @@
             transform: scale(1.08);
             z-index: -3;
         }
-
         body::after {
             content: "";
             position: fixed;
@@ -71,8 +62,7 @@
             background: var(--overlay-color);
             z-index: -2;
         }
-
-        /* ============ Background decorative effects ============ */
+        /* Background Decorative Effects */
         .bg-effects {
             position: fixed;
             inset: 0;
@@ -80,7 +70,6 @@
             overflow: hidden;
             pointer-events: none;
         }
-
         .bubble {
             position: absolute;
             bottom: -220px;
@@ -101,42 +90,26 @@
             --drift1: 0px;
             --drift2: 0px;
         }
-
         @keyframes floatUp {
             0% {
                 transform: translateY(0) translateX(0) scale(.9);
                 opacity: 0;
             }
-
-            10% {
-                opacity: var(--bopacity, .5);
-            }
-
-            35% {
-                transform: translateY(-38vh) translateX(var(--drift1, 18px)) scale(1.02);
-            }
-
-            65% {
-                transform: translateY(-78vh) translateX(var(--drift2, -14px)) scale(1.06);
-            }
-
-            88% {
-                opacity: calc(var(--bopacity, .5) * .6);
-            }
-
+            10% {opacity: var(--bopacity, .5);}
+            35% {transform: translateY(-38vh) translateX(var(--drift1, 18px)) scale(1.02);}
+            65% {transform: translateY(-78vh) translateX(var(--drift2, -14px)) scale(1.06);}
+            88% {opacity: calc(var(--bopacity, .5) * .6);}
             100% {
                 transform: translateY(-128vh) translateX(0) scale(.94);
                 opacity: 0;
             }
         }
-
         .blur-circle {
             position: absolute;
             border-radius: 50%;
             filter: blur(60px);
             opacity: .35;
         }
-
         .blur-circle.one {
             width: 340px;
             height: 340px;
@@ -144,7 +117,6 @@
             left: -100px;
             background: var(--main-color);
         }
-
         .blur-circle.two {
             width: 420px;
             height: 420px;
@@ -152,8 +124,7 @@
             right: -120px;
             background: var(--accent-color);
         }
-
-        /* ============ Ambient light ============ */
+        /* Ambient light */
         .ambient-light {
             position: absolute;
             border-radius: 50%;
@@ -162,7 +133,6 @@
             will-change: transform;
             animation: ambientDrift ease-in-out infinite alternate;
         }
-
         .ambient-light.a1 {
             width: 520px;
             height: 520px;
@@ -171,7 +141,6 @@
             background: radial-gradient(circle, var(--main-color), rgba(0, 0, 0, 0) 70%);
             animation-duration: 26s;
         }
-
         .ambient-light.a2 {
             width: 600px;
             height: 600px;
@@ -181,7 +150,6 @@
             animation-duration: 32s;
             animation-delay: -6s;
         }
-
         .ambient-light.a3 {
             width: 420px;
             height: 420px;
@@ -192,7 +160,6 @@
             animation-delay: -10s;
             opacity: .2;
         }
-
         .ambient-light.a4 {
             width: 380px;
             height: 380px;
@@ -203,22 +170,12 @@
             animation-delay: -4s;
             opacity: .2;
         }
-
         @keyframes ambientDrift {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            50% {
-                transform: translate(4%, 3%) scale(1.08);
-            }
-
-            100% {
-                transform: translate(-3%, -4%) scale(1);
-            }
+            0% {transform: translate(0, 0) scale(1);}
+            50% {transform: translate(4%, 3%) scale(1.08);}
+            100% {transform: translate(-3%, -4%) scale(1);}
         }
-
-        /* ============ Glass rings ============ */
+        /* Glass rings */
         .glass-ring {
             position: absolute;
             left: var(--rx, 50%);
@@ -235,71 +192,45 @@
                 inset 0 0 18px color-mix(in srgb, var(--accent-color) 12%, transparent 88%);
             opacity: var(--ropacity, .18);
         }
-
-        .glass-ring.spin {
-            animation: ringRotate var(--rduration, 40s) linear infinite;
-        }
-
+        .glass-ring.spin {animation: ringRotate var(--rduration, 40s) linear infinite;}
         .glass-ring.rise {
             bottom: -200px;
             top: auto;
             animation: ringRise var(--rduration, 30s) ease-in-out infinite;
             animation-delay: var(--rdelay, 0s);
         }
-
         .glass-ring.pulse {
             animation: ringPulse var(--rduration, 8s) ease-in-out infinite;
             animation-delay: var(--rdelay, 0s);
         }
-
         @keyframes ringRotate {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
         }
-
         @keyframes ringRise {
             0% {
                 transform: translateY(0) rotate(0deg);
                 opacity: 0;
             }
-
-            12% {
-                opacity: var(--ropacity, .18);
-            }
-
-            50% {
-                transform: translateY(-60vh) rotate(90deg);
-            }
-
-            88% {
-                opacity: calc(var(--ropacity, .18) * .5);
-            }
-
+            12% {opacity: var(--ropacity, .18);}
+            50% {transform: translateY(-60vh) rotate(90deg);}
+            88% {opacity: calc(var(--ropacity, .18) * .5);}
             100% {
                 transform: translateY(-120vh) rotate(180deg);
                 opacity: 0;
             }
         }
-
         @keyframes ringPulse {
-
             0%,
             100% {
                 transform: scale(.85);
                 opacity: calc(var(--ropacity, .18) * .7);
             }
-
             50% {
                 transform: scale(1.15);
                 opacity: var(--ropacity, .18);
             }
         }
-
         .particle {
             position: absolute;
             width: var(--psize, 4px);
@@ -312,21 +243,17 @@
             animation-duration: var(--pduration, 3.5s);
             animation-delay: var(--pdelay, 0s);
         }
-
         @keyframes twinkle {
-
             0%,
             100% {
                 opacity: .12;
                 transform: scale(.8);
             }
-
             50% {
                 opacity: var(--popacity, .8);
                 transform: scale(1.5);
             }
         }
-
         .sparkle {
             position: absolute;
             width: 10px;
@@ -340,22 +267,18 @@
             animation-duration: var(--sduration, 4s);
             animation-delay: var(--sdelay, 0s);
         }
-
         @keyframes sparkle-pop {
-
             0%,
             100% {
                 opacity: 0;
                 transform: scale(.4) rotate(0deg);
             }
-
             50% {
                 opacity: .95;
                 transform: scale(1) rotate(45deg);
             }
         }
-
-        /* ============ Layout ============ */
+        /* Layout */
         .page-wrap {
             position: relative;
             z-index: 1;
@@ -366,7 +289,6 @@
             align-items: center;
             gap: 28px;
         }
-
         .content-grid {
             display: flex;
             align-items: stretch;
@@ -374,9 +296,8 @@
             gap: 32px;
             width: 100%;
         }
-
         .content-main {
-            position: relative;   /* anchors the flash bolt peeking behind the title card */
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -384,13 +305,10 @@
             flex: 1.2;
             min-width: 0;
         }
-
-        /* ============ Glass card base ============ */
+        /* Glass card base */
         .glass-card {
             position: relative;
             background: var(--glass-bg);
-            /* faint base border; the lit top-left corner comes from the
-               gradient ring in ::before so it fades with no hard edges */
             border: 1px solid rgba(255, 255, 255, .10);
             border-radius: 28px;
             backdrop-filter: blur(22px) saturate(140%);
@@ -403,15 +321,12 @@
             transition: transform .45s cubic-bezier(.2, .8, .2, 1), box-shadow .45s ease, background .45s ease;
             animation: floatCard 6s ease-in-out infinite;
         }
-
-        /* single light source: bright white at the top-left corner, smoothly
-           fading out along the top and left edges into the faint base border */
         .glass-card::before {
             content: "";
             position: absolute;
             inset: -1px;
             border-radius: inherit;
-            padding: 1.5px;   /* ring thickness */
+            padding: 1.5px;
             background: linear-gradient(135deg,
                     rgba(255, 255, 255, .9),
                     rgba(255, 255, 255, .38) 26%,
@@ -425,11 +340,7 @@
             opacity: .85;
             transition: opacity .45s ease;
         }
-
-        .glass-card:hover::before {
-            opacity: 1;
-        }
-
+        .glass-card:hover::before {opacity: 1;}
         .glass-card:hover {
             transform: translateY(-6px);
             background: var(--glass-bg-strong);
@@ -439,24 +350,13 @@
                 inset 0 0 30px rgba(255, 255, 255, .12),
                 inset 1px 1px 0 rgba(255, 255, 255, .26);
         }
-
         @keyframes floatCard {
-
             0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
+            100% {transform: translateY(0);}
+            50% {transform: translateY(-8px);}
         }
-
-        .glass-card:hover {
-            animation-play-state: paused;
-        }
-
-        /* ============ Image card ============ */
+        .glass-card:hover {animation-play-state: paused;}
+        /* Image card */
         .image-card {
             flex: 1;
             display: flex;
@@ -470,7 +370,6 @@
             max-height: calc(var(--image-natural-h) + 100px);
             overflow: hidden;
         }
-
         .image-frame {
             width: 100%;
             aspect-ratio: 1/1;
@@ -481,7 +380,6 @@
             box-shadow: 0 10px 30px var(--shadow), 0 0 26px color-mix(in srgb, var(--accent-color) 16%, transparent 84%);
             flex-shrink: 0;
         }
-
         .image-frame img {
             width: 100%;
             height: 100%;
@@ -489,7 +387,6 @@
             object-position: center top;
             display: block;
         }
-
         .user-name {
             margin-top: 22px;
             font-size: 1.5rem;
@@ -497,13 +394,11 @@
             letter-spacing: .3px;
             color: var(--text-color);
         }
-
-        /* ============ Title card ============ */
+        /* Title card */
         .title-card {
             padding: 30px 40px;
             text-align: center;
         }
-
         .title-card h1 {
             font-size: 2.4rem;
             font-weight: 700;
@@ -514,20 +409,15 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        /* ============ Message card ============ */
-        .message-card {
-            padding: 30px 36px;
-        }
-
+        /* Message card */
+        .message-card {padding: 30px 36px;}
         .message-card p {
             font-size: 1.05rem;
             line-height: 1.75;
             color: var(--text-muted);
             font-weight: 400;
         }
-
-        /* ============ Date card ============ */
+        /* Date card */
         .date-card {
             padding: 18px 30px;
             display: inline-flex;
@@ -541,8 +431,6 @@
             letter-spacing: .4px;
             animation-delay: .3s;
         }
-
-        /* 3D clock pinned on the date card corner */
         .clock-deco {
             position: absolute;
             top: -20px;
@@ -553,19 +441,12 @@
             filter: drop-shadow(0 0 8px var(--accent-color));
             animation: clockSway 5.5s ease-in-out infinite;
         }
-
         @keyframes clockSway {
             0%,
-            100% {
-                transform: translateY(0) rotate(-15deg);
-            }
-
-            50% {
-                transform: translateY(-7px) rotate(15deg);
-            }
+            100% {transform: translateY(0) rotate(-15deg);}
+            50% {transform: translateY(-7px) rotate(15deg);}
         }
-
-        /* ============ Chrome decorations ============ */
+        /* Chrome decorations */
         .chrome-star {
             position: absolute;
             width: var(--stw, 60px);
@@ -573,36 +454,20 @@
             animation: starDrift var(--stdur, 12s) ease-in-out infinite;
             animation-delay: var(--stdelay, 0s);
         }
-
         .chrome-star.big {
-            /* sits around the center, drifting very slowly, no glow */
             top: calc(50% - 95px);
             left: calc(50% - 95px);
             --stw: 190px;
             --stdur: 34s;
             opacity: .9;
         }
-
-        .chrome-star.small {
-            filter: drop-shadow(0 0 9px var(--accent-color));
-        }
-
+        .chrome-star.small {filter: drop-shadow(0 0 9px var(--accent-color));}
         @keyframes starDrift {
             0%,
-            100% {
-                transform: translateY(0) rotate(-6deg);
-            }
-
-            50% {
-                transform: translateY(-24px) rotate(8deg);
-            }
+            100% {transform: translateY(0) rotate(-6deg);}
+            50% {transform: translateY(-24px) rotate(8deg);}
         }
-
-        /* flash bolt peeking out from behind the title card */
-        .title-wrap {
-            position: relative;
-        }
-
+        .title-wrap {position: relative;}
         .flash-chrome {
             position: absolute;
             top: -34px;
@@ -614,51 +479,21 @@
                 flashFloat 7s ease-in-out infinite,
                 flashFlicker 3.4s linear infinite;
         }
-
         @keyframes flashFloat {
             0%,
-            100% {
-                transform: translateY(0) rotate(10deg);
-            }
-
-            50% {
-                transform: translateY(-10px) rotate(15deg);
-            }
+            100% {transform: translateY(0) rotate(10deg);}
+            50% {transform: translateY(-10px) rotate(15deg);}
         }
-
-        /* irregular steps = electric flicker */
         @keyframes flashFlicker {
             0%,
-            100% {
-                filter: drop-shadow(0 0 3px rgba(255, 240, 160, .3));
-            }
-
-            12% {
-                filter: drop-shadow(0 0 16px rgba(255, 225, 110, .95));
-            }
-
-            18% {
-                filter: drop-shadow(0 0 5px rgba(255, 240, 160, .4));
-            }
-
-            26% {
-                filter: drop-shadow(0 0 12px rgba(255, 225, 110, .8));
-            }
-
-            47% {
-                filter: drop-shadow(0 0 4px rgba(255, 240, 160, .35));
-            }
-
-            62% {
-                filter: drop-shadow(0 0 18px rgba(255, 225, 110, 1));
-            }
-
-            71% {
-                filter: drop-shadow(0 0 6px rgba(255, 240, 160, .45));
-            }
+            100% {filter: drop-shadow(0 0 3px rgba(255, 240, 160, .3));}
+            12% {filter: drop-shadow(0 0 16px rgba(255, 225, 110, .95));}
+            18% {filter: drop-shadow(0 0 5px rgba(255, 240, 160, .4));}
+            26% {filter: drop-shadow(0 0 12px rgba(255, 225, 110, .8));}
+            47% {filter: drop-shadow(0 0 4px rgba(255, 240, 160, .35));}
+            62% {filter: drop-shadow(0 0 18px rgba(255, 225, 110, 1));}
+            71% {filter: drop-shadow(0 0 6px rgba(255, 240, 160, .45));}
         }
-
-        /* plane & rocket flying along the 45° they point at */
         .fly-diagonal {
             position: absolute;
             width: var(--fw, 54px);
@@ -667,14 +502,12 @@
             animation: fly45 var(--fdur, 20s) linear infinite;
             animation-delay: var(--fdelay, 0s);
         }
-
         .fly-diagonal.plane {
             bottom: 18%;
             left: -4%;
             --fw: 60px;
             --fdur: 27s;
         }
-
         .fly-diagonal.rocket {
             bottom: -6%;
             left: 42%;
@@ -682,21 +515,13 @@
             --fdur: 19s;
             --fdelay: 7s;
         }
-
         @keyframes fly45 {
             0% {
                 transform: translate(0, 0);
                 opacity: 0;
             }
-
-            6% {
-                opacity: .8;
-            }
-
-            80% {
-                opacity: .8;
-            }
-
+            6% {opacity: .8;}
+            80% {opacity: .8;}
             100% {
                 transform: translate(100vmin, -100vmin);
                 opacity: 0;
@@ -710,130 +535,60 @@
             pointer-events: none;
             animation: microscopeSwing 9s ease-in-out infinite;
         }
-
         .microscope-rig img {
             width: 100%;
             height: auto;
             display: block;
         }
-
         @keyframes microscopeSwing {
             0%,
-            100% {
-                transform: translate(0, 0) rotate(16deg);
-            }
-
-            /* leans in over the title text, then eases back out */
-            50% {
-                transform: translate(-52px, 18px) rotate(-14deg);
-            }
+            100% {transform: translate(0, 0) rotate(16deg);}
+            50% {transform: translate(-52px, 18px) rotate(-14deg);}
         }
-
-        /* ============ Responsive ============ */
+        /* Responsive */
         @media (max-width: 900px) {
-            .content-grid {
-                gap: 24px;
-            }
-
-            .title-card h1 {
-                font-size: 2rem;
-            }
-
-            .image-frame {
-                max-width: 260px;
-            }
-
-            .image-card {
-                --image-natural-h: 370px;
-            }
+            .content-grid {gap: 24px;}
+            .title-card h1 {font-size: 2rem;}
+            .image-frame {max-width: 260px;}
+            .image-card {--image-natural-h: 370px;}
         }
-
         @media (max-width: 720px) {
             .content-grid {
                 flex-direction: column;
                 align-items: center;
             }
-
             .image-card {
                 width: 100%;
                 max-width: 420px;
                 max-height: none;
                 justify-content: center;
             }
-
             .content-main {
                 width: 100%;
                 max-width: 420px;
             }
-
-            .glass-card {
-                border-radius: 22px;
-            }
+            .glass-card {border-radius: 22px;}
         }
-
         @media (max-width: 480px) {
-            body {
-                padding: 32px 16px;
-            }
-
-            .image-frame {
-                max-width: 220px;
-            }
-
-            .title-card h1 {
-                font-size: 1.6rem;
-            }
-
-            .title-card,
-            .message-card {
-                padding: 24px 22px;
-            }
-
-            .user-name {
-                font-size: 1.25rem;
-            }
-
-            .message-card p {
-                font-size: .98rem;
-            }
-
+            body {padding: 32px 16px;}
+            .image-frame {max-width: 220px;}
+            .title-card h1 {font-size: 1.6rem;}
+            .title-card, .message-card {padding: 24px 22px;}
+            .user-name {font-size: 1.25rem;}
+            .message-card p {font-size: .98rem;}
             .date-card {
                 padding: 14px 22px;
                 font-size: .92rem;
             }
         }
-
-        @media (max-width: 1200px) {
-            body::before {
-                background-position: right center;
-            }
-        }
-
+        @media (max-width: 1200px) {body::before {background-position: right center;}}
         @media (prefers-reduced-motion: reduce) {
-
-            .glass-card,
-            .bubble,
-            .particle,
-            .sparkle,
-            .glass-ring,
-            .ambient-light,
-            .chrome-star,
-            .flash-chrome,
-            .fly-diagonal,
-            .clock-deco,
-            .microscope-rig {
-                animation: none !important;
-            }
-
-            .glass-card:hover {
-                transform: none;
-            }
+            .glass-card, .bubble, .particle, .sparkle, .glass-ring, .ambient-light, .chrome-star, .flash-chrome, .fly-diagonal, .clock-deco, .microscope-rig {animation: none !important;}
+            .glass-card:hover {transform: none;}
         }
     </style>
 </head>
-
 <body>
-
     <div class="bg-effects" id="bgEffects">
         <div class="blur-circle one"></div>
         <div class="blur-circle two"></div>
@@ -841,41 +596,28 @@
         <div class="ambient-light a2"></div>
         <div class="ambient-light a3"></div>
         <div class="ambient-light a4"></div>
-
         <!-- chrome stars: 1 big (center, slow, no glow), 2 medium, 3 small (glowing) -->
         <img class="chrome-star big" src="../../assets/images/Chrome Star.png" alt="">
-        <img class="chrome-star" src="../../assets/images/Chrome Star.png" alt=""
-            style="top: 12%; right: 12%; --stw: 84px; --stdur: 15s;">
-        <img class="chrome-star" src="../../assets/images/Chrome Star.png" alt=""
-            style="bottom: 16%; left: 8%; --stw: 76px; --stdur: 17s; --stdelay: 2s;">
-        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt=""
-            style="top: 18%; left: 16%; --stw: 42px; --stdur: 10s; --stdelay: 1s;">
-        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt=""
-            style="top: 55%; right: 7%; --stw: 36px; --stdur: 12s; --stdelay: 3.5s;">
-        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt=""
-            style="bottom: 9%; right: 32%; --stw: 46px; --stdur: 11s; --stdelay: 2.4s;">
-
+        <img class="chrome-star" src="../../assets/images/Chrome Star.png" alt="" style="top: 12%; right: 12%; --stw: 84px; --stdur: 15s;">
+        <img class="chrome-star" src="../../assets/images/Chrome Star.png" alt="" style="bottom: 16%; left: 8%; --stw: 76px; --stdur: 17s; --stdelay: 2s;">
+        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt="" style="top: 18%; left: 16%; --stw: 42px; --stdur: 10s; --stdelay: 1s;">
+        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt="" style="top: 55%; right: 7%; --stw: 36px; --stdur: 12s; --stdelay: 3.5s;">
+        <img class="chrome-star small" src="../../assets/images/Chrome Star.png" alt="" style="bottom: 9%; right: 32%; --stw: 46px; --stdur: 11s; --stdelay: 2.4s;">
         <!-- planes & rockets flying at 45° -->
         <img class="fly-diagonal plane" src="../../assets/images/3D Plane.png" alt="">
         <img class="fly-diagonal rocket" src="../../assets/images/3D Rocket.png" alt="">
-        <img class="fly-diagonal" src="../../assets/images/3D Plane.png" alt=""
-            style="bottom: 42%; left: 8%; --fw: 42px; --fdur: 32s; --fdelay: 12s;">
-        <img class="fly-diagonal" src="../../assets/images/3D Rocket.png" alt=""
-            style="bottom: -10%; left: 12%; --fw: 56px; --fdur: 23s; --fdelay: 3s;">
-        <img class="fly-diagonal" src="../../assets/images/3D Plane.png" alt=""
-            style="bottom: 6%; left: 60%; --fw: 38px; --fdur: 26s; --fdelay: 16s;">
+        <img class="fly-diagonal" src="../../assets/images/3D Plane.png" alt="" style="bottom: 42%; left: 8%; --fw: 42px; --fdur: 32s; --fdelay: 12s;">
+        <img class="fly-diagonal" src="../../assets/images/3D Rocket.png" alt="" style="bottom: -10%; left: 12%; --fw: 56px; --fdur: 23s; --fdelay: 3s;">
+        <img class="fly-diagonal" src="../../assets/images/3D Plane.png" alt="" style="bottom: 6%; left: 60%; --fw: 38px; --fdur: 26s; --fdelay: 16s;">
     </div>
-
     <main class="page-wrap">
         <div class="content-grid">
-
             <section class="glass-card image-card">
                 <div class="image-frame">
                     <img src="{{ IMAGE }}" alt="{{ NAME }}">
                 </div>
                 <div class="user-name">{{ NAME }}</div>
             </section>
-
             <div class="content-main">
                 <div class="title-wrap">
                     <!-- painted before the title card, so the card covers its lower half -->
@@ -888,33 +630,27 @@
                         <img src="../../assets/images/3D Microscope.png" alt="">
                     </div>
                 </div>
-
                 <section class="glass-card message-card">
                     <p>{{ MESSAGE }}</p>
                 </section>
             </div>
             <!-- /content-main -->
-
         </div>
-
         <section class="glass-card date-card">
             <img class="clock-deco" src="../../assets/images/3D Clock.png" alt="">
             <span>{{ DATE }}</span>
         </section>
     </main>
-
     <script>
         (function () {
             const container = document.getElementById('bgEffects');
             const rand = (min, max) => min + Math.random() * (max - min);
-
-            /* ---------- Bubbles: tiny / medium / large, fully randomized ---------- */
+            /* Bubbles: tiny / medium / large, fully randomized */
             const bubbleTiers = [
-                { count: 10, min: 8, max: 26 },   // tiny
-                { count: 9, min: 30, max: 90 },   // medium
-                { count: 5, min: 120, max: 250 }    // large
+                { count: 10, min: 8, max: 26 },
+                { count: 9, min: 30, max: 90 },
+                { count: 5, min: 120, max: 250 }
             ];
-
             bubbleTiers.forEach(tier => {
                 for (let i = 0; i < tier.count; i++) {
                     const b = document.createElement('div');
@@ -922,7 +658,6 @@
                     const size = rand(tier.min, tier.max);
                     const isLarge = tier.max > 100;
                     const isTiny = tier.max <= 26;
-
                     b.style.setProperty('--bsize', size.toFixed(1) + 'px');
                     b.style.setProperty('--bx', rand(-4, 100).toFixed(1) + '%');
                     b.style.setProperty('--bblur', (isLarge ? rand(1.5, 4) : isTiny ? rand(0, 1) : rand(0.3, 2)).toFixed(2) + 'px');
@@ -932,20 +667,16 @@
                     b.style.setProperty('--bdelay', rand(0, 22).toFixed(1) + 's');
                     b.style.setProperty('--drift1', rand(-60, 60).toFixed(0) + 'px');
                     b.style.setProperty('--drift2', rand(-70, 70).toFixed(0) + 'px');
-
                     container.appendChild(b);
                 }
             });
-
-            /* ---------- Glass rings: rotate / rise / pulse ---------- */
+            /* Glass rings: rotate / rise / pulse */
             const ringTypes = ['spin', 'rise', 'pulse'];
             const ringCount = 7;
-
             for (let i = 0; i < ringCount; i++) {
                 const r = document.createElement('div');
                 const type = ringTypes[i % ringTypes.length];
                 r.className = 'glass-ring ' + type;
-
                 const size = rand(90, 260);
                 r.style.setProperty('--rsize', size.toFixed(0) + 'px');
                 r.style.setProperty('--rx', rand(0, 92).toFixed(1) + '%');
@@ -953,11 +684,9 @@
                 r.style.setProperty('--ropacity', rand(.1, .24).toFixed(2));
                 r.style.setProperty('--rduration', (type === 'spin' ? rand(34, 60) : type === 'rise' ? rand(24, 42) : rand(6, 11)).toFixed(1) + 's');
                 r.style.setProperty('--rdelay', rand(0, 12).toFixed(1) + 's');
-
                 container.appendChild(r);
             }
-
-            /* ---------- Glowing particles ---------- */
+            /* Glowing particles */
             const particleCount = 30;
             for (let i = 0; i < particleCount; i++) {
                 const p = document.createElement('div');
@@ -970,8 +699,7 @@
                 p.style.setProperty('--pdelay', rand(0, 5).toFixed(1) + 's');
                 container.appendChild(p);
             }
-
-            /* ---------- Sparkles ---------- */
+            /* Sparkles */
             const sparkleCount = 8;
             for (let i = 0; i < sparkleCount; i++) {
                 const s = document.createElement('div');
@@ -982,8 +710,7 @@
                 s.style.setProperty('--sdelay', rand(0, 6).toFixed(1) + 's');
                 container.appendChild(s);
             }
-
-            /* ---------- Hide decorative PNGs whose images are missing ---------- */
+            /* Hide decorative PNGs whose images are missing */
             document.querySelectorAll('.chrome-star, .flash-chrome, .fly-diagonal, .clock-deco, .microscope-rig img').forEach(img => {
                 img.addEventListener('error', () => {
                     const rig = img.closest('.microscope-rig');
@@ -992,7 +719,5 @@
             });
         })();
     </script>
-
 </body>
-
 </html>

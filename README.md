@@ -212,7 +212,7 @@ BirthdayProject.zip
         └── ...             # Every decorative PNG the template uses
 ```
 
-* No CSS or JS files are split out — the site is one HTML file plus images.
+* No CSS or JS files are split out - the site is one HTML file plus images.
 * Decorative images are discovered by scanning the template for `../../assets/` references, fetched, and bundled automatically.
 * Unzip and open, or drop the folder on any static host.
 
@@ -240,7 +240,7 @@ Nothing ever leaves the browser until you export.
 
 # ➕ Adding a New Template
 
-This is the whole point of the architecture — three steps, no app-code changes beyond one registry entry:
+This is the whole point of the architecture - three steps, no app-code changes beyond one registry entry:
 
 1. Create the folder and file:
 
@@ -262,7 +262,7 @@ This is the whole point of the architecture — three steps, no app-code changes
 
 3. (Optional) Add its original palette to `TEMPLATE_DEFAULT_COLORS` so the **Default Template Colors** theme works for it.
 
-Done — it appears in the editor's template picker automatically.
+Done - it appears in the editor's template picker automatically.
 
 ---
 

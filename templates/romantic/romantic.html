@@ -1,62 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ TITLE }}</title>
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
     <!-- Romantic fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
-
     <style>
         :root {
-            /* ===== Core palette — the app's theme fills these in ===== */
+            /* Core palette — the app's theme fills these in */
             --main-color: {{ PRIMARY }};
             --accent-color: {{ SECONDARY }};
-            --cover-1: color-mix(in srgb, var(--main-color) 80%, black 20%);   /* cover gradient start */
-            --cover-2: var(--main-color);                                      /* cover gradient end */
-            --cover-trim: #f6d186;              /* gold ornament on the cover */
-
+            --cover-1: color-mix(in srgb, var(--main-color) 80%, black 20%);              /* cover gradient start */
+            --cover-2: var(--main-color);                                                   /* cover gradient end */
+            --cover-trim: #f6d186;                                                        /* gold ornament on the cover */
             --text-color: {{ TEXT }};
             --text-muted: color-mix(in srgb, var(--text-color) 65%, transparent 35%);
-
             --background-1: {{ BACKGROUND }};
             --background-2: color-mix(in srgb, var(--background-1) 85%, var(--main-color) 15%);
             --background-3: color-mix(in srgb, var(--background-1) 75%, var(--main-color) 25%);
-
-            --page-bg: color-mix(in srgb, {{ SURFACE }} 96%, var(--main-color) 4%);   /* book paper */
-            --frame-bg: {{ SURFACE }};          /* polaroid frame */
+            --page-bg: color-mix(in srgb, {{ SURFACE }} 96%, var(--main-color) 4%);         /* book paper */
+            --frame-bg: {{ SURFACE }};                                                      /* polaroid frame */
             --message-bg: color-mix(in srgb, var(--page-bg) 92%, var(--main-color) 8%);
             --message-border: var(--accent-color);
-
-            /* neutral charcoal shadows — hardcoded so they look right on every theme */
-            --shadow: rgba(40, 38, 44, .28);
-            --heart-glow: color-mix(in srgb, {{ GLOW }} 85%, transparent 15%);   /* CSS heart edge glow */
-            --spine-shadow: rgba(40, 38, 44, .22);  /* book center crease */
-
-            /* ===== Fonts ===== */
+            --shadow: rgba(40, 38, 44, .28);                                              /* neutral charcoal shadows — hardcoded so they look right on every theme */
+            --heart-glow: color-mix(in srgb, {{ GLOW }} 85%, transparent 15%);              /* CSS heart edge glow */
+            --spine-shadow: rgba(40, 38, 44, .22);                                        /* book center crease */
+            /* Fonts */
             --font-script: 'Dancing Script', cursive;
             --font-body: 'Quicksand', sans-serif;
         }
-
-        * {
+        *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        html,
-        body {
+        html, body {
             min-height: 100%;
             overflow-x: hidden;
         }
-
         body {
             position: relative;
             min-height: 100vh;
@@ -72,8 +58,7 @@
             justify-content: center;
             padding: 48px 20px;
         }
-
-        /* ============ Background effects ============ */
+        /* Background effects */
         .bg-effects {
             position: fixed;
             inset: 0;
@@ -81,8 +66,7 @@
             overflow: hidden;
             pointer-events: none;
         }
-
-        /* floating emoji decorations */
+        /* Floating Emoji Decorations */
         .decor {
             position: absolute;
             font-size: var(--dsize, 2rem);
@@ -91,19 +75,11 @@
             animation: decorFloat var(--dduration, 6s) ease-in-out infinite;
             animation-delay: var(--ddelay, 0s);
         }
-
         @keyframes decorFloat {
             0%,
-            100% {
-                transform: translateY(0) rotate(-5deg);
-            }
-
-            50% {
-                transform: translateY(-16px) rotate(6deg);
-            }
+            100% {transform: translateY(0) rotate(-5deg);}
+            50% {transform: translateY(-16px) rotate(6deg);}
         }
-
-        /* balloons rising from the bottom (spawned by JS) */
         .balloon {
             position: absolute;
             bottom: -280px;
@@ -115,48 +91,30 @@
             animation: balloonRise var(--bduration, 20s) ease-in-out infinite;
             animation-delay: var(--bdelay, 0s);
         }
-
         @keyframes balloonRise {
             0% {
                 transform: translateY(0) translateX(0) rotate(-2deg);
                 opacity: 0;
             }
-
-            8% {
-                opacity: var(--bopacity, .7);
-            }
-
-            40% {
-                transform: translateY(-45vh) translateX(var(--drift1, 24px)) rotate(3deg);
-            }
-
-            75% {
-                transform: translateY(-90vh) translateX(var(--drift2, -18px)) rotate(-3deg);
-            }
-
-            92% {
-                opacity: calc(var(--bopacity, .7) * .5);
-            }
-
+            8% {opacity: var(--bopacity, .7);}
+            40% {transform: translateY(-45vh) translateX(var(--drift1, 24px)) rotate(3deg);}
+            75% {transform: translateY(-90vh) translateX(var(--drift2, -18px)) rotate(-3deg);}
+            92% {opacity: calc(var(--bopacity, .7) * .5);}
             100% {
                 transform: translateY(-135vh) translateX(0) rotate(2deg);
                 opacity: 0;
             }
         }
-
-        /* ============ Book layout ============ */
+        /* Book layout */
         .mainBody {
             position: relative;
             z-index: 2;
         }
-
         .card-container {
-            /* one page of the book — the open spread is twice this wide */
             width: min(430px, 44vw);
             aspect-ratio: 3 / 4;
             perspective: 1800px;
         }
-
         .book-card {
             width: 100%;
             height: 100%;
@@ -164,13 +122,8 @@
             transform-style: preserve-3d;
             transition: transform 1.1s cubic-bezier(.55, .06, .35, 1);
         }
-
-        /* recenter the whole book once the spread is open */
-        .card-container.open .book-card {
-            transform: translateX(50%);
-        }
-
-        /* ============ Cover (front + left page) ============ */
+        .card-container.open .book-card {transform: translateX(50%);}
+        /* Cover (front + left page) */
         .cover {
             width: 100%;
             height: 100%;
@@ -184,13 +137,8 @@
             cursor: pointer;
             user-select: none;
         }
-
-        .card-container.open .cover {
-            transform: rotateY(-180deg);
-        }
-
-        .cover-front,
-        .cover-back {
+        .card-container.open .cover {transform: rotateY(-180deg);}
+        .cover-front, .cover-back {
             width: 100%;
             height: 100%;
             position: absolute;
@@ -201,8 +149,7 @@
             border-radius: 6px 14px 14px 6px;
             box-shadow: 8px 10px 26px var(--shadow);
         }
-
-        /* ---- Front cover ---- */
+        /* Front cover */
         .cover-front {
             background:
                 radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .14), transparent 55%),
@@ -216,8 +163,6 @@
             text-align: center;
             padding: 28px;
         }
-
-        /* gold ornamental inner border */
         .cover-front::before {
             content: "";
             position: absolute;
@@ -226,7 +171,6 @@
             border-radius: 4px 10px 10px 4px;
             pointer-events: none;
         }
-
         .wax-seal {
             width: 64px;
             height: 64px;
@@ -241,29 +185,18 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, .3), inset 0 -3px 8px rgba(0, 0, 0, .25);
             animation: sealPulse 2.4s ease-in-out infinite;
         }
-
         @keyframes sealPulse {
             0%,
-            100% {
-                transform: scale(1);
-            }
-
-            12% {
-                transform: scale(1.12);
-            }
-
-            24% {
-                transform: scale(1);
-            }
+            100% {transform: scale(1);}
+            12% {transform: scale(1.12);}
+            24% {transform: scale(1);}
         }
-
         .cover-title {
             font-family: var(--font-script);
             font-size: clamp(2rem, 5.2vw, 3.2rem);
             font-weight: 700;
             text-shadow: 0 2px 10px rgba(0, 0, 0, .3);
         }
-
         .cover-hint {
             font-size: clamp(.7rem, 1.4vw, .9rem);
             letter-spacing: 1.5px;
@@ -271,17 +204,11 @@
             opacity: .9;
             animation: hintBlink 2.4s ease-in-out infinite;
         }
-
-        @keyframes hintBlink {
-            50% {
-                opacity: .45;
-            }
-        }
-
-        /* ---- Left page (back of cover) ---- */
+        @keyframes hintBlink {50% {opacity: .45;}}
+        /* Left page (back of cover) */
         .cover-back {
             background: var(--page-bg);
-            transform: rotateY(180deg);   /* pre-flipped so it reads correctly when open */
+            transform: rotateY(180deg);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -290,8 +217,6 @@
             padding: clamp(16px, 3vw, 30px);
             border-radius: 14px 6px 6px 14px;
         }
-
-        /* soft crease near the spine (right edge of the open left page) */
         .cover-back::after {
             content: "";
             position: absolute;
@@ -303,8 +228,7 @@
             border-radius: 0 6px 6px 0;
             pointer-events: none;
         }
-
-        /* ============ Polaroid frame (like default template) ============ */
+        /* Polaroid frame */
         .photo-frame {
             position: relative;
             width: min(78%, 300px);
@@ -318,7 +242,6 @@
             flex-direction: column;
             gap: 8px;
         }
-
         .photo-wrap {
             position: relative;
             width: 100%;
@@ -326,7 +249,6 @@
             border-radius: 5px;
             overflow: hidden;
         }
-
         .photo-wrap img {
             width: 100%;
             height: 100%;
@@ -334,7 +256,6 @@
             object-position: center top;
             display: block;
         }
-
         .photo-caption {
             font-family: var(--font-script);
             font-size: clamp(1rem, 2.4vw, 1.4rem);
@@ -342,19 +263,16 @@
             color: var(--text-color);
             text-align: center;
         }
-
-        /* ribbon PNG pinned on the frame corner */
         .ribbon {
             position: absolute;
             top: -26px;
             left: -26px;
-            width: clamp(48px, 7vw, 72px);   /* rescales whatever the PNG's real size is */
+            width: clamp(48px, 7vw, 72px);
             height: auto;
             z-index: 3;
             filter: drop-shadow(0 4px 8px var(--shadow));
         }
-
-        /* ============ CSS heart pulse over the photo ============ */
+        /* CSS heart pulse over the photo */
         .heart-pulse {
             position: absolute;
             top: 50%;
@@ -362,43 +280,31 @@
             width: 100px;
             height: 100px;
             margin: -50px 0 0 -50px;
-            /* heart shape */
             clip-path: path("M50,91 C25,71 4,51 4,30 C4,14 16,4 29,4 C38,4 46,9 50,17 C54,9 62,4 71,4 C84,4 96,14 96,30 C96,51 75,71 50,91 Z");
-            /* very translucent middle, red glow toward the edges */
             background: radial-gradient(circle at 50% 42%,
                     rgba(255, 60, 95, .05) 30%,
                     rgba(255, 60, 95, .22) 60%,
                     var(--heart-glow) 96%);
             opacity: 0;
             pointer-events: none;
-            /* ~2s grow & fade + ~3s rest = 5s cycle */
             animation: heartBloom 5s ease-in-out infinite;
         }
-
         @keyframes heartBloom {
             0% {
                 transform: scale(.35);
                 opacity: 0;
             }
-
-            8% {
-                opacity: .95;
-            }
-
-            /* grows while slowly fading away */
+            8% {opacity: .95;}
             40% {
                 transform: scale(1.25);
                 opacity: 0;
             }
-
-            /* rests ~3s before repeating */
             100% {
                 transform: scale(1.25);
                 opacity: 0;
             }
         }
-
-        /* ============ Date under the frame ============ */
+        /* Date under the frame */
         .date-line {
             display: inline-flex;
             align-items: center;
@@ -408,19 +314,14 @@
             letter-spacing: .5px;
             color: var(--text-muted);
         }
-
-        .date-line i {
-            color: var(--main-color);
-        }
-
+        .date-line i {color: var(--main-color);}
         .close-hint {
             font-size: clamp(.6rem, 1.2vw, .72rem);
             letter-spacing: 1px;
             text-transform: uppercase;
             color: color-mix(in srgb, var(--text-muted) 60%, transparent 40%);
         }
-
-        /* ============ Right page ============ */
+        /* Right page */
         .inside-right {
             width: 100%;
             height: 100%;
@@ -438,8 +339,6 @@
             text-align: center;
             z-index: 1;
         }
-
-        /* soft crease near the spine (left edge of the right page) */
         .inside-right::before {
             content: "";
             position: absolute;
@@ -451,7 +350,6 @@
             border-radius: 6px 0 0 6px;
             pointer-events: none;
         }
-
         .page-title {
             font-family: var(--font-script);
             font-size: clamp(1.5rem, 3.6vw, 2.6rem);
@@ -461,7 +359,6 @@
             text-shadow: 0 2px 8px color-mix(in srgb, var(--main-color) 25%, transparent 75%);
             overflow-wrap: anywhere;
         }
-
         .title-divider {
             display: flex;
             align-items: center;
@@ -470,19 +367,13 @@
             color: var(--accent-color);
             font-size: .7rem;
         }
-
-        .title-divider::before,
-        .title-divider::after {
+        .title-divider::before, .title-divider::after {
             content: "";
             width: clamp(28px, 6vw, 60px);
             height: 1.5px;
             background: linear-gradient(90deg, transparent, var(--accent-color));
         }
-
-        .title-divider::after {
-            background: linear-gradient(90deg, var(--accent-color), transparent);
-        }
-
+        .title-divider::after {background: linear-gradient(90deg, var(--accent-color), transparent);}
         .message-box {
             flex: 1;
             min-height: 0;
@@ -493,7 +384,6 @@
             overflow-y: auto;
             text-align: left;
         }
-
         .message-box p {
             font-size: clamp(.8rem, 1.7vw, 1rem);
             line-height: 1.75;
@@ -501,17 +391,11 @@
             font-weight: 500;
             overflow-wrap: anywhere;
         }
-
-        .message-box::-webkit-scrollbar {
-            width: 6px;
-        }
-
+        .message-box::-webkit-scrollbar {width: 6px;}
         .message-box::-webkit-scrollbar-thumb {
             background: var(--accent-color);
             border-radius: 3px;
         }
-
-        /* glowing heart poking out of the page's bottom-right corner */
         .glow-heart {
             position: absolute;
             bottom: -13px;
@@ -519,14 +403,10 @@
             font-size: 26px;
             color: var(--main-color);
             opacity: 0;
-            transition: opacity .8s ease .6s;   /* appears once the book is open */
+            transition: opacity .8s ease .6s;
             animation: heartGlow 2.2s ease-in-out infinite;
         }
-
-        .card-container.open .glow-heart {
-            opacity: 1;
-        }
-
+        .card-container.open .glow-heart {opacity: 1;}
         @keyframes heartGlow {
             0%,
             100% {
@@ -534,7 +414,6 @@
                     drop-shadow(0 0 4px color-mix(in srgb, var(--main-color) 70%, transparent 30%));
                 transform: scale(1);
             }
-
             50% {
                 filter:
                     drop-shadow(0 0 10px var(--main-color))
@@ -542,42 +421,30 @@
                 transform: scale(1.14);
             }
         }
-
-        /* ============ Responsive ============ */
+        /* Responsive */
         @media (max-width: 680px) {
             .card-container {
                 width: min(430px, 46vw);
             }
-
             .ribbon {
                 top: -18px;
                 left: -18px;
             }
-
             .heart-pulse {
                 width: 60px;
                 height: 60px;
                 margin: -30px 0 0 -30px;
                 clip-path: path("M30,54.6 C15,42.6 2.4,30.6 2.4,18 C2.4,8.4 9.6,2.4 17.4,2.4 C22.8,2.4 27.6,5.4 30,10.2 C32.4,5.4 37.2,2.4 42.6,2.4 C50.4,2.4 57.6,8.4 57.6,18 C57.6,30.6 45,42.6 30,54.6 Z");
             }
-
             .glow-heart {
                 font-size: 20px;
                 bottom: -10px;
                 right: -10px;
             }
-
-            .balloon {
-                --bsize: 60px !important;
-            }
-
-            .decor {
-                opacity: .4;
-            }
+            .balloon {--bsize: 60px !important;}
+            .decor {opacity: .4;}
         }
-
         @media (prefers-reduced-motion: reduce) {
-
             *,
             *::before,
             *::after {
@@ -586,23 +453,18 @@
         }
     </style>
 </head>
-
 <body>
-
-    <!-- ============ Background layer ============ -->
+    <!-- Background layer -->
     <div class="bg-effects" id="bgEffects">
         <div class="decor" style="top: 8%; left: 6%; --dsize: 2.2rem; --dduration: 7s;">🌹</div>
         <div class="decor" style="top: 14%; right: 8%; --dsize: 1.8rem; --dduration: 5.5s; --ddelay: 1s;">💕</div>
         <div class="decor" style="bottom: 16%; left: 10%; --dsize: 1.6rem; --dduration: 6.5s; --ddelay: .5s;">🎀</div>
         <div class="decor" style="bottom: 10%; right: 12%; --dsize: 2rem; --dduration: 8s; --ddelay: 1.6s;">✨</div>
         <div class="decor" style="top: 45%; left: 3%; --dsize: 1.4rem; --dduration: 6s; --ddelay: 2.2s;">💖</div>
-        <!-- balloons are spawned here by JS -->
     </div>
-
     <main class="mainBody">
         <div class="card-container" id="bookContainer">
             <div class="book-card">
-
                 <div class="cover" id="bookCover">
                     <!-- Front cover -->
                     <div class="cover-front">
@@ -610,7 +472,6 @@
                         <h2 class="cover-title">Open Me</h2>
                         <p class="cover-hint"><i class="fa-solid fa-envelope-open-text"></i> a surprise for {{ NAME }}</p>
                     </div>
-
                     <!-- Left page -->
                     <div class="cover-back">
                         <div class="photo-frame">
@@ -628,7 +489,6 @@
                         <p class="close-hint">tap this page to close 🎀</p>
                     </div>
                 </div>
-
                 <!-- Right page -->
                 <div class="inside-right">
                     <h1 class="page-title">Happy Birthday {{ NAME }} 🎂</h1>
@@ -638,30 +498,25 @@
                     </div>
                     <i class="fa-solid fa-heart glow-heart"></i>
                 </div>
-
             </div>
         </div>
     </main>
-
     <script>
         (function () {
             const rand = (min, max) => min + Math.random() * (max - min);
-
-            /* ---------- Book open / close on click ---------- */
+            /* Book open / close on click */
             const container = document.getElementById('bookContainer');
             const cover = document.getElementById('bookCover');
-            // clicking the front cover opens; once open, the same element is
-            // the left page — clicking it again closes the book
+            // clicking the front cover opens, once open, the same element is
+            // the left page - clicking it again closes the book
             cover.addEventListener('click', () => container.classList.toggle('open'));
-
-            /* ---------- Balloons rising in random, unsynced order ---------- */
+            /* Balloons rising in random, unsynced order */
             const bg = document.getElementById('bgEffects');
             const balloonImgs = [
                 '../../assets/images/Pink Balloons.png',
                 '../../assets/images/Red Balloons.png'
             ];
             const balloonCount = 8;
-
             for (let i = 0; i < balloonCount; i++) {
                 const b = document.createElement('img');
                 b.className = 'balloon';
@@ -677,14 +532,11 @@
                 b.addEventListener('error', () => b.remove());
                 bg.appendChild(b);
             }
-
-            /* ---------- Hide decorative PNGs whose images are missing ---------- */
+            // Hide decorative PNGs whose images are missing
             document.querySelectorAll('.ribbon').forEach(img => {
                 img.addEventListener('error', () => { img.style.display = 'none'; });
             });
         })();
     </script>
-
 </body>
-
 </html>

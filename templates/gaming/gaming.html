@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ TITLE }}</title>
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
     <!-- Gaming fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,54 +13,42 @@
 
     <style>
         :root {
-            /* ===== Core palette — the app's theme fills these in ===== */
+            /* Core palette — the app's theme fills these in */
             --main-color: {{ PRIMARY }};
             --accent-color: {{ ACCENT }};
             --secondary-accent: {{ SECONDARY }};
-
             --text-color: {{ TEXT }};
             --text-muted: color-mix(in srgb, var(--text-color) 72%, transparent 28%);
-
             --background-1: {{ BACKGROUND }};
             --background-2: color-mix(in srgb, var(--background-1) 85%, var(--main-color) 15%);
             --background-3: color-mix(in srgb, var(--background-1) 85%, var(--accent-color) 15%);
-
             --panel-bg: color-mix(in srgb, {{ SURFACE }} 55%, transparent 45%);
             --panel-bg-strong: color-mix(in srgb, {{ SURFACE }} 75%, transparent 25%);
             --panel-border: color-mix(in srgb, var(--main-color) 45%, transparent 55%);
-
             --grid-line: color-mix(in srgb, var(--main-color) 12%, transparent 88%);
             --scanline-color: rgba(0, 0, 0, .18);
             --shadow: rgba(0, 0, 0, .55);
-
             --glow-main: color-mix(in srgb, var(--main-color) 80%, white 20%);
             --glow-accent: color-mix(in srgb, var(--accent-color) 80%, white 20%);
-            --hp-color: #4ade80;                /* HP bar green */
-            --xp-color: var(--accent-color);    /* XP bar */
-
-            --bg-text-color: color-mix(in srgb, var(--main-color) 22%, transparent 78%);   /* typed background console text */
-
-            --start-glow: #ffb02e;              /* yellow-orange glow for the START button */
-            --spider-thread: rgba(255, 255, 255, .85);  /* spider silk line */
-
-            /* ===== Fonts ===== */
+            --hp-color: #4ade80;
+            --xp-color: var(--accent-color);
+            --bg-text-color: color-mix(in srgb, var(--main-color) 22%, transparent 78%);
+            --start-glow: #ffb02e;
+            --spider-thread: rgba(255, 255, 255, .85);
+            /* Fonts */
             --font-pixel: 'Press Start 2P', monospace;
             --font-display: 'Orbitron', sans-serif;
             --font-body: 'Rajdhani', sans-serif;
         }
-
-        * {
+        *{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        html,
-        body {
+        html, body {
             min-height: 100%;
             overflow-x: hidden;
         }
-
         body {
             position: relative;
             min-height: 100vh;
@@ -80,8 +65,7 @@
             justify-content: center;
             padding: 56px 24px;
         }
-
-        /* ============ Retro grid floor ============ */
+        /* Retro grid floor */
         body::before {
             content: "";
             position: fixed;
@@ -95,8 +79,7 @@
             z-index: -3;
             pointer-events: none;
         }
-
-        /* ============ CRT scanlines ============ */
+        /* CRT scanlines */
         body::after {
             content: "";
             position: fixed;
@@ -109,8 +92,7 @@
             z-index: 50;
             pointer-events: none;
         }
-
-        /* ============ Background effects layer ============ */
+        /* Background effects layer */
         .bg-effects {
             position: fixed;
             inset: 0;
@@ -118,7 +100,6 @@
             overflow: hidden;
             pointer-events: none;
         }
-
         .ambient-glow {
             position: absolute;
             border-radius: 50%;
@@ -126,7 +107,6 @@
             opacity: .30;
             animation: ambientPulse 9s ease-in-out infinite alternate;
         }
-
         .ambient-glow.g1 {
             width: 480px;
             height: 480px;
@@ -134,7 +114,6 @@
             left: -10%;
             background: var(--main-color);
         }
-
         .ambient-glow.g2 {
             width: 540px;
             height: 540px;
@@ -143,20 +122,17 @@
             background: var(--accent-color);
             animation-delay: -4s;
         }
-
         @keyframes ambientPulse {
             from {
                 opacity: .18;
                 transform: scale(.95);
             }
-
             to {
                 opacity: .38;
                 transform: scale(1.1);
             }
         }
-
-        /* ---- Typed console text in the background ---- */
+        /* Typed console text in the background */
         .bg-console {
             position: absolute;
             font-family: var(--font-pixel);
@@ -165,22 +141,15 @@
             letter-spacing: 1px;
             white-space: nowrap;
         }
-
         .bg-console::after {
             content: "▌";
             animation: cursorBlink 1s steps(1) infinite;
         }
-
-        @keyframes cursorBlink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-        /* ---- Floating PNG decorations ---- */
+        @keyframes cursorBlink {50% {opacity: 0;}}
+        /* Floating PNG decorations */
         .float-png {
             position: absolute;
-            width: var(--fsize, 48px);   /* small fixed width — original PNG size doesn't matter */
+            width: var(--fsize, 48px);
             height: auto;
             opacity: var(--fopacity, .55);
             image-rendering: pixelated;
@@ -188,19 +157,12 @@
             animation: floatDrift var(--fduration, 8s) ease-in-out infinite;
             animation-delay: var(--fdelay, 0s);
         }
-
         @keyframes floatDrift {
             0%,
-            100% {
-                transform: translateY(0) rotate(-4deg);
-            }
-
-            50% {
-                transform: translateY(-22px) rotate(6deg);
-            }
+            100% {transform: translateY(0) rotate(-4deg);}
+            50% {transform: translateY(-22px) rotate(6deg);}
         }
-
-        /* ---- Twinkling pixel stars ---- */
+        /* Twinkling pixel stars */
         .pixel-star {
             position: absolute;
             width: var(--ssize, 4px);
@@ -210,21 +172,18 @@
             animation: starTwinkle var(--sduration, 3s) ease-in-out infinite;
             animation-delay: var(--sdelay, 0s);
         }
-
         @keyframes starTwinkle {
             0%,
             100% {
                 opacity: .1;
                 transform: scale(.7);
             }
-
             50% {
                 opacity: .9;
                 transform: scale(1.3);
             }
         }
-
-        /* ============ Layout ============ */
+        /* Layout */
         .page-wrap {
             position: relative;
             z-index: 1;
@@ -234,8 +193,7 @@
             flex-direction: column;
             gap: 26px;
         }
-
-        /* ============ HUD top bar ============ */
+        /* HUD top bar */
         .hud-bar {
             display: flex;
             align-items: center;
@@ -253,58 +211,36 @@
             -webkit-backdrop-filter: blur(8px);
             box-shadow: 0 0 18px color-mix(in srgb, var(--main-color) 20%, transparent 80%);
         }
-
         .hud-lives {
             display: flex;
             gap: 8px;
             color: var(--secondary-accent);
             font-size: .8rem;
         }
-
         .hud-lives i {
             filter: drop-shadow(0 0 6px var(--secondary-accent));
             animation: heartBeat 1.6s ease-in-out infinite;
         }
-
-        .hud-lives i:nth-child(2) {
-            animation-delay: .2s;
-        }
-
-        .hud-lives i:nth-child(3) {
-            animation-delay: .4s;
-        }
-
+        .hud-lives i:nth-child(2) {animation-delay: .2s;}
+        .hud-lives i:nth-child(3) {animation-delay: .4s;}
         @keyframes heartBeat {
             0%,
-            100% {
-                transform: scale(1);
-            }
-
-            12% {
-                transform: scale(1.25);
-            }
-
-            24% {
-                transform: scale(1);
-            }
+            100% {transform: scale(1);}
+            12% {transform: scale(1.25);}
+            24% {transform: scale(1);}
         }
-
         .hud-score i {
             color: gold;
             margin-right: 6px;
         }
-
-        /* ============ Content grid ============ */
+        /* Content grid */
         .content-grid {
-            /* flex-start keeps the player card at its natural height
-               instead of stretching alongside a long message */
             display: flex;
             align-items: flex-start;
             gap: 30px;
             width: 100%;
         }
-
-        /* ============ Panel base ============ */
+        /* Panel base */
         .game-panel {
             position: relative;
             background: var(--panel-bg);
@@ -318,7 +254,6 @@
                 inset 0 1px 0 rgba(255, 255, 255, .08);
             transition: box-shadow .4s ease, border-color .4s ease, transform .4s ease;
         }
-
         .game-panel:hover {
             border-color: color-mix(in srgb, var(--accent-color) 60%, var(--panel-border) 40%);
             box-shadow:
@@ -327,10 +262,8 @@
                 inset 0 1px 0 rgba(255, 255, 255, .12);
             transform: translateY(-4px);
         }
-
         /* corner brackets on panels */
-        .game-panel::before,
-        .game-panel::after {
+        .game-panel::before, .game-panel::after {
             content: "";
             position: absolute;
             width: 18px;
@@ -339,22 +272,19 @@
             border-style: solid;
             opacity: .9;
         }
-
         .game-panel::before {
             top: -2px;
             left: -2px;
             border-width: 2px 0 0 2px;
             border-radius: 8px 0 0 0;
         }
-
         .game-panel::after {
             bottom: -2px;
             right: -2px;
             border-width: 0 2px 2px 0;
             border-radius: 0 0 8px 0;
         }
-
-        /* ============ Player card ============ */
+        /* Player card */
         .player-card {
             flex: 1;
             min-width: 280px;
@@ -364,13 +294,11 @@
             padding: 30px 28px;
             text-align: center;
         }
-
         .avatar-wrap {
             position: relative;
             width: 100%;
             max-width: 300px;
         }
-
         .avatar-frame {
             width: 100%;
             aspect-ratio: 1/1;
@@ -381,7 +309,6 @@
                 0 0 18px color-mix(in srgb, var(--main-color) 45%, transparent 55%),
                 0 10px 26px var(--shadow);
         }
-
         .avatar-frame img {
             width: 100%;
             height: 100%;
@@ -389,38 +316,31 @@
             object-position: center top;
             display: block;
         }
-
-        /* absolute-positioned pixel PNGs pinned to the avatar corners */
         .corner-png {
             position: absolute;
-            width: 52px;   /* rescales whatever the PNG's real size is */
+            width: 52px;
             height: auto;
             image-rendering: pixelated;
             filter: drop-shadow(0 0 8px var(--secondary-accent));
             animation: heartBeat 1.8s ease-in-out infinite;
             z-index: 2;
         }
-
         .corner-png.heart {
             top: -22px;
             right: -20px;
         }
-
         .corner-png.star {
             bottom: -18px;
             left: -20px;
             filter: drop-shadow(0 0 8px var(--glow-accent));
             animation: floatDrift 5s ease-in-out infinite;
         }
-
         .corner-png.mail {
             top: -20px;
             right: -18px;
             filter: drop-shadow(0 0 8px var(--glow-accent));
             animation: floatDrift 6s ease-in-out infinite;
         }
-
-        /* amongus peeking on the player-card panel corner */
         .corner-png.amongus {
             width: 100px;
             bottom: -24px;
@@ -429,49 +349,36 @@
             filter: drop-shadow(0 0 8px var(--glow-main));
             animation: amongusPeek 8s ease-in-out infinite;
         }
-
         @keyframes amongusPeek {
             0% {
                 opacity: 0;
                 transform: scaleX(1);
             }
-
-            /* smooth appear, looking right */
             8% {
                 opacity: 1;
                 transform: scaleX(1);
             }
-
             34% {
                 opacity: 1;
                 transform: scaleX(1);
             }
-
-            /* quick flip to look left */
             38% {
                 opacity: 1;
                 transform: scaleX(-1);
             }
-
-            /* ~1.5s pause facing left */
             56% {
                 opacity: 1;
                 transform: scaleX(-1);
             }
-
-            /* smooth fade out */
             66% {
                 opacity: 0;
                 transform: scaleX(-1);
             }
-
-            /* stays hidden ~2.7s before repeating */
             100% {
                 opacity: 0;
                 transform: scaleX(-1);
             }
         }
-
         .player-tag {
             margin-top: 22px;
             font-family: var(--font-pixel);
@@ -480,7 +387,6 @@
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-
         .player-name {
             margin-top: 10px;
             max-width: 100%;
@@ -492,8 +398,7 @@
             overflow-wrap: anywhere;
             text-shadow: 0 0 12px color-mix(in srgb, var(--main-color) 60%, transparent 40%);
         }
-
-        /* ---- stat bars ---- */
+        /* stat bars */
         .stat-bars {
             width: 100%;
             max-width: 300px;
@@ -502,7 +407,6 @@
             flex-direction: column;
             gap: 12px;
         }
-
         .stat-row {
             display: flex;
             align-items: center;
@@ -511,20 +415,12 @@
             font-size: .5rem;
             color: var(--text-muted);
         }
-
         .stat-row i {
             width: 16px;
             text-align: center;
         }
-
-        .stat-row .fa-heart {
-            color: var(--hp-color);
-        }
-
-        .stat-row .fa-bolt {
-            color: var(--xp-color);
-        }
-
+        .stat-row .fa-heart {color: var(--hp-color);}
+        .stat-row .fa-bolt {color: var(--xp-color);}
         .stat-track {
             flex: 1;
             height: 10px;
@@ -533,7 +429,6 @@
             border: 1px solid rgba(255, 255, 255, .12);
             overflow: hidden;
         }
-
         .stat-fill {
             height: 100%;
             border-radius: 5px;
@@ -544,12 +439,10 @@
             box-shadow: 0 0 10px var(--fill-color, var(--hp-color));
             animation: fillUp 1.6s cubic-bezier(.2, .8, .2, 1) both;
         }
-
         .stat-fill.hp {
             --fill: 100%;
             --fill-color: var(--hp-color);
         }
-
         .stat-fill.xp {
             --fill: 86%;
             --fill-color: var(--xp-color);
@@ -558,14 +451,8 @@
                 0 0 10px var(--xp-color),
                 0 0 22px color-mix(in srgb, var(--xp-color) 60%, transparent 40%);
         }
-
-        @keyframes fillUp {
-            from {
-                width: 0;
-            }
-        }
-
-        /* ============ Main column ============ */
+        @keyframes fillUp {from {width: 0;}}
+        /* Main column */
         .content-main {
             flex: 1.35;
             min-width: 0;
@@ -574,13 +461,11 @@
             justify-content: center;
             gap: 24px;
         }
-
-        /* ============ Title panel ============ */
+        /* Title panel */
         .title-panel {
             padding: 34px 38px;
             text-align: center;
         }
-
         .level-up {
             font-family: var(--font-pixel);
             font-size: .6rem;
@@ -590,14 +475,7 @@
             margin-bottom: 18px;
             animation: blinkSoft 2.2s steps(2) infinite;
         }
-
-        @keyframes blinkSoft {
-            50% {
-                opacity: .35;
-            }
-        }
-
-        /* neon title with pulsing glow + glitch */
+        @keyframes blinkSoft {50% {opacity: .35;}}
         .neon-title {
             position: relative;
             display: inline-block;
@@ -608,10 +486,9 @@
             line-height: 1.3;
             text-transform: uppercase;
             color: var(--text-color);
-            overflow-wrap: anywhere;   /* very long names wrap instead of overflowing */
+            overflow-wrap: anywhere;
             animation: neonPulse 2.8s ease-in-out infinite;
         }
-
         @keyframes neonPulse {
             0%,
             100% {
@@ -620,7 +497,6 @@
                     0 0 16px var(--main-color),
                     0 0 38px color-mix(in srgb, var(--main-color) 60%, transparent 40%);
             }
-
             50% {
                 text-shadow:
                     0 0 10px var(--glow-main),
@@ -629,10 +505,7 @@
                     0 0 90px color-mix(in srgb, var(--accent-color) 55%, transparent 45%);
             }
         }
-
-        /* glitch layers */
-        .neon-title::before,
-        .neon-title::after {
+        .neon-title::before, .neon-title::after {
             content: attr(data-text);
             position: absolute;
             inset: 0;
@@ -640,58 +513,44 @@
             opacity: .85;
             pointer-events: none;
         }
-
         .neon-title::before {
             color: var(--accent-color);
             animation: glitchShift 3.5s steps(2, jump-none) infinite;
             clip-path: inset(15% 0 60% 0);
         }
-
         .neon-title::after {
             color: var(--secondary-accent);
             animation: glitchShift 3.5s steps(2, jump-none) infinite reverse;
             clip-path: inset(65% 0 8% 0);
         }
-
         @keyframes glitchShift {
-            0%,
-            86%,
-            100% {
+            0%, 86%, 100% {
                 transform: translate(0, 0);
                 opacity: 0;
             }
-
             88% {
                 transform: translate(-4px, 2px);
                 opacity: .8;
             }
-
             90% {
                 transform: translate(4px, -1px);
                 opacity: .8;
             }
-
             92% {
                 transform: translate(-2px, -2px);
                 opacity: .6;
             }
-
             94% {
                 transform: translate(3px, 1px);
                 opacity: .7;
             }
-
             96% {
                 transform: translate(0, 0);
                 opacity: 0;
             }
         }
-
-        /* ============ Message panel (quest log) ============ */
-        .message-panel {
-            padding: 28px 32px;
-        }
-
+        /* Message panel */
+        .message-panel {padding: 28px 32px;}
         .quest-header {
             display: flex;
             align-items: center;
@@ -705,21 +564,16 @@
             padding-bottom: 12px;
             border-bottom: 1px dashed color-mix(in srgb, var(--accent-color) 40%, transparent 60%);
         }
-
-        .quest-header i {
-            filter: drop-shadow(0 0 6px var(--glow-accent));
-        }
-
+        .quest-header i {filter: drop-shadow(0 0 6px var(--glow-accent));}
         .message-panel p {
             font-size: 1.12rem;
             font-weight: 500;
             line-height: 1.8;
             color: var(--text-muted);
             letter-spacing: .3px;
-            overflow-wrap: anywhere;   /* long unbroken text wraps instead of spilling out */
+            overflow-wrap: anywhere;
         }
-
-        /* ============ Date panel ============ */
+        /* Date panel */
         .date-panel {
             align-self: center;
             display: inline-flex;
@@ -731,18 +585,15 @@
             font-weight: 700;
             letter-spacing: 1.5px;
         }
-
         .date-panel i {
             color: var(--accent-color);
             filter: drop-shadow(0 0 8px var(--glow-accent));
         }
-
-        /* ============ Press start footer (PNG button) ============ */
+        /* Press start footer (PNG button) */
         .press-start {
             display: flex;
             justify-content: center;
         }
-
         .press-start img {
             width: min(230px, 58vw);
             height: auto;
@@ -751,34 +602,24 @@
                 startFloat 4s ease-in-out infinite,
                 startGlow 2.2s ease-in-out infinite;
         }
-
         @keyframes startFloat {
             0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-12px);
-            }
+            100% {transform: translateY(0);}
+            50% {transform: translateY(-12px);}
         }
-
         @keyframes startGlow {
-            0%,
-            100% {
+            0%, 100% {
                 filter:
                     drop-shadow(0 0 5px color-mix(in srgb, var(--start-glow) 70%, transparent 30%))
                     drop-shadow(0 0 14px color-mix(in srgb, var(--start-glow) 40%, transparent 60%));
             }
-
             50% {
                 filter:
                     drop-shadow(0 0 10px var(--start-glow))
                     drop-shadow(0 0 30px color-mix(in srgb, var(--start-glow) 75%, transparent 25%));
             }
         }
-
-        /* ============ Minecraft spider dropping from the ceiling ============ */
+        /* Minecraft spider dropping from the ceiling */
         .spider-rig {
             position: fixed;
             top: 0;
@@ -792,88 +633,48 @@
             animation: spiderDrop 11s ease-in-out infinite;
             animation-delay: 1.5s;
         }
-
         .spider-thread {
             width: 2px;
             height: 200px;
             background: linear-gradient(to bottom, transparent, var(--spider-thread));
             box-shadow: 0 0 6px rgba(255, 255, 255, .3);
         }
-
         .spider-rig img {
-            width: 96px;   /* medium */
+            width: 96px;
             height: auto;
             image-rendering: pixelated;
-            /* pull the spider up over the thread so the silk ends
-               at its center, behind the PNG (img paints on top) */
             margin-top: -48px;
             filter: drop-shadow(0 6px 12px var(--shadow));
         }
-
         @keyframes spiderDrop {
-            0% {
-                transform: translateY(-105%);
-            }
-
-            /* slow descent */
-            32% {
-                transform: translateY(0);
-            }
-
-            /* hangs there for a bit */
-            50% {
-                transform: translateY(0);
-            }
-
-            /* climbs back up */
-            80% {
-                transform: translateY(-105%);
-            }
-
-            /* ~2s hidden pause, then repeats */
-            100% {
-                transform: translateY(-105%);
-            }
+            0% {transform: translateY(-105%);}
+            32% {transform: translateY(0);}
+            50% {transform: translateY(0);}
+            80% {transform: translateY(-105%);}
+            100% {transform: translateY(-105%);}
         }
-
-        /* ============ Screen-corner floaters (glider / battle bus) ============ */
-        /* two nested animations on different axes + different durations
-           = wandering circular-ish path, never just up-down or left-right */
+        /* Screen-corner floaters (glider / battle bus) */
         .screen-float {
             position: fixed;
             z-index: 5;
             pointer-events: none;
             animation: driftX var(--dx-duration, 7s) ease-in-out infinite alternate;
         }
-
         .screen-float img {
             display: block;
-            width: var(--fw, 70px);   /* small — rescales the PNG */
+            width: var(--fw, 70px);
             height: auto;
             filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-color) 35%, transparent 65%));
             animation: driftY var(--dy-duration, 4.6s) ease-in-out infinite alternate;
         }
-
         @keyframes driftX {
-            from {
-                transform: translateX(calc(var(--dx, 26px) * -1)) rotate(-2deg);
-            }
-
-            to {
-                transform: translateX(var(--dx, 26px)) rotate(2deg);
-            }
+            from {transform: translateX(calc(var(--dx, 26px) * -1)) rotate(-2deg);}
+            to {transform: translateX(var(--dx, 26px)) rotate(2deg);}
         }
-
         @keyframes driftY {
-            from {
-                transform: translateY(calc(var(--dy, 18px) * -1));
-            }
-
-            to {
-                transform: translateY(var(--dy, 18px));
-            }
+            from {transform: translateY(calc(var(--dy, 18px) * -1));}
+            to {transform: translateY(var(--dy, 18px));}
         }
-
         .screen-float.glider {
             top: 6%;
             right: 4%;
@@ -883,7 +684,6 @@
             --dx-duration: 7.5s;
             --dy-duration: 4.8s;
         }
-
         .screen-float.bus {
             bottom: 5%;
             left: 3%;
@@ -893,137 +693,72 @@
             --dx-duration: 8.5s;
             --dy-duration: 5.6s;
         }
-
-        /* ============ Responsive ============ */
+        /* Responsive */
         @media (max-width: 920px) {
             .content-grid {
                 flex-direction: column;
                 align-items: center;
             }
-
-            .player-card,
-            .content-main {
+            .player-card, .content-main {
                 width: 100%;
                 max-width: 480px;
             }
-
-            .neon-title {
-                font-size: clamp(1.4rem, 5.4vw, 2.2rem);
-            }
+            .neon-title {font-size: clamp(1.4rem, 5.4vw, 2.2rem);}
         }
-
         @media (max-width: 520px) {
-            body {
-                padding: 36px 14px;
-            }
-
+            body {padding: 36px 14px;}
             .hud-bar {
                 justify-content: center;
                 font-size: .5rem;
             }
-
-            .title-panel {
-                padding: 26px 20px;
-            }
-
-            .message-panel {
-                padding: 22px 18px;
-            }
-
-            .message-panel p {
-                font-size: 1rem;
-            }
-
-            .avatar-wrap {
-                max-width: 240px;
-            }
-
-            .corner-png {
-                width: 40px;
-            }
-
-            .corner-png.amongus {
-                width: 46px;
-            }
-
-            .float-png {
-                --fopacity: .3;
-            }
-
+            .title-panel {padding: 26px 20px;}
+            .message-panel {padding: 22px 18px;}
+            .message-panel p {font-size: 1rem;}
+            .avatar-wrap {max-width: 240px;}
+            .corner-png {width: 40px;}
+            .corner-png.amongus {width: 46px;}
+            .float-png {--fopacity: .3;}
             .spider-rig img {
                 width: 62px;
                 margin-top: -31px;
             }
-
-            .spider-thread {
-                height: 130px;
-            }
-
-            .screen-float.glider {
-                --fw: 52px;
-            }
-
-            .screen-float.bus {
-                --fw: 60px;
-            }
+            .spider-thread {height: 130px;}
+            .screen-float.glider {--fw: 52px;}
+            .screen-float.bus {--fw: 60px;}
         }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation: none !important;
-            }
-        }
+        @media (prefers-reduced-motion: reduce) {*, *::before, *::after {animation: none !important;}}
     </style>
 </head>
-
 <body>
-
-    <!-- ============ Background layer ============ -->
+    <!-- Background layer -->
     <div class="bg-effects" id="bgEffects">
         <div class="ambient-glow g1"></div>
         <div class="ambient-glow g2"></div>
-
         <!-- typed console lines (text filled in by JS typing animation) -->
         <div class="bg-console" style="top: 12%; left: 5%;" data-text="> PLAYER_2 JOINED THE PARTY..."></div>
         <div class="bg-console" style="top: 30%; right: 6%;" data-text="> ACHIEVEMENT UNLOCKED: ANOTHER YEAR"></div>
         <div class="bg-console" style="bottom: 24%; left: 8%;" data-text="> LOADING CAKE.EXE ██████ 100%"></div>
         <div class="bg-console" style="bottom: 10%; right: 10%;" data-text="> +9999 XP GAINED"></div>
-
-        <!-- floating PNGs — swap the src paths for real images later -->
-        <img class="float-png" src="../../assets/images/Pixelated Casette.png" alt=""
-            style="top: 18%; left: 12%; --fsize: 54px; --fduration: 9s;">
-        <img class="float-png" src="../../assets/images/Pixelated Heart.png" alt=""
-            style="top: 8%; right: 18%; --fsize: 40px; --fduration: 7s; --fdelay: 1.2s;">
-        <img class="float-png" src="../../assets/images/Pixelated Coin.png" alt=""
-            style="top: 55%; left: 4%; --fsize: 36px; --fduration: 6s; --fdelay: .6s;">
-        <img class="float-png" src="../../assets/images/Pixelated Overwatch Char 1.png" alt=""
-            style="bottom: 14%; right: 5%; --fsize: 50px; --fduration: 8s; --fdelay: 2s;">
-        <img class="float-png" src="../../assets/images/Pixelated star.png" alt=""
-            style="bottom: 32%; left: 20%; --fsize: 32px; --fduration: 10s; --fdelay: 1.6s;">
-        <img class="float-png" src="../../assets/images/Minecraft Sword.png" alt=""
-            style="top: 40%; right: 12%; --fsize: 44px; --fduration: 7.5s; --fdelay: .9s;">
+        <img class="float-png" src="../../assets/images/Pixelated Casette.png" alt="" style="top: 18%; left: 12%; --fsize: 54px; --fduration: 9s;">
+        <img class="float-png" src="../../assets/images/Pixelated Heart.png" alt="" style="top: 8%; right: 18%; --fsize: 40px; --fduration: 7s; --fdelay: 1.2s;">
+        <img class="float-png" src="../../assets/images/Pixelated Coin.png" alt="" style="top: 55%; left: 4%; --fsize: 36px; --fduration: 6s; --fdelay: .6s;">
+        <img class="float-png" src="../../assets/images/Pixelated Overwatch Char 1.png" alt="" style="bottom: 14%; right: 5%; --fsize: 50px; --fduration: 8s; --fdelay: 2s;">
+        <img class="float-png" src="../../assets/images/Pixelated star.png" alt="" style="bottom: 32%; left: 20%; --fsize: 32px; --fduration: 10s; --fdelay: 1.6s;">
+        <img class="float-png" src="../../assets/images/Minecraft Sword.png" alt="" style="top: 40%; right: 12%; --fsize: 44px; --fduration: 7.5s; --fdelay: .9s;">
     </div>
-
-    <!-- ============ Screen decorations ============ -->
+    <!-- Screen decorations -->
     <div class="spider-rig">
         <div class="spider-thread"></div>
         <img src="../../assets/images/Minecraft Spider.png" alt="">
     </div>
-
     <div class="screen-float glider">
         <img src="../../assets/images/Fortnite Glider.png" alt="">
     </div>
-
     <div class="screen-float bus">
         <img src="../../assets/images/battle bus.png" alt="">
     </div>
-
     <main class="page-wrap">
-
-        <!-- ============ HUD bar ============ -->
+        <!-- HUD bar -->
         <header class="hud-bar">
             <span class="hud-lives">
                 <i class="fa-solid fa-heart"></i>
@@ -1033,13 +768,10 @@
             <span>LEVEL UP DAY</span>
             <span class="hud-score"><i class="fa-solid fa-coins"></i>SCORE 999999</span>
         </header>
-
         <div class="content-grid">
-
-            <!-- ============ Player card ============ -->
+            <!-- Player card -->
             <section class="game-panel player-card">
                 <div class="avatar-wrap">
-                    <!-- absolute-positioned pixel PNGs on the avatar corners -->
                     <img class="corner-png heart" src="../../assets/images/Pixelated Heart.png" alt="">
                     <img class="corner-png star" src="../../assets/images/Pixelated star.png" alt="">
                     <div class="avatar-frame">
@@ -1064,18 +796,14 @@
                         </div>
                     </div>
                 </div>
-                <!-- amongus peeking on the panel corner -->
                 <img class="corner-png amongus" src="../../assets/images/Pixelated amongus.png" alt="">
             </section>
-
-            <!-- ============ Main column ============ -->
+            <!-- Main column  -->
             <div class="content-main">
-
                 <section class="game-panel title-panel">
                     <div class="level-up"><i class="fa-solid fa-arrow-up"></i> LEVEL UP!</div>
                     <h1 class="neon-title" data-text="Happy Birthday {{ NAME }}">Happy Birthday {{ NAME }}</h1>
                 </section>
-
                 <section class="game-panel message-panel">
                     <img class="corner-png mail" src="../../assets/images/Pixelated Mail.png" alt="">
                     <div class="quest-header">
@@ -1084,27 +812,21 @@
                     </div>
                     <p>{{ MESSAGE }}</p>
                 </section>
-
                 <section class="game-panel date-panel">
                     <i class="fa-solid fa-calendar-days"></i>
                     <span>{{ DATE }}</span>
                 </section>
-
             </div>
         </div>
-
         <footer class="press-start">
             <img src="../../assets/images/START Button.png" alt="Press start to celebrate">
         </footer>
-
     </main>
-
     <script>
         (function () {
             const rand = (min, max) => min + Math.random() * (max - min);
             const bg = document.getElementById('bgEffects');
-
-            /* ---------- Twinkling pixel stars ---------- */
+            /* Twinkling pixel stars */
             const starCount = 34;
             for (let i = 0; i < starCount; i++) {
                 const s = document.createElement('div');
@@ -1116,21 +838,17 @@
                 s.style.setProperty('--sdelay', rand(0, 5).toFixed(1) + 's');
                 bg.appendChild(s);
             }
-
-            /* ---------- Typing animation for background console lines ---------- */
+            /* Typing animation for background console lines */
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             document.querySelectorAll('.bg-console').forEach((el, idx) => {
                 const fullText = el.dataset.text;
-
                 if (reduceMotion) {
                     el.textContent = fullText;
                     return;
                 }
-
                 const typeSpeed = 70;
                 const holdTime = 2600;
                 const startDelay = idx * 900;
-
                 function typeLoop() {
                     let i = 0;
                     el.textContent = '';
@@ -1141,12 +859,9 @@
                             setTimeout(typeLoop, holdTime);
                         }
                     }, typeSpeed);
-                }
-
-                setTimeout(typeLoop, startDelay);
+                } setTimeout(typeLoop, startDelay);
             });
-
-            /* ---------- Occasional random glitch jolt on the title ---------- */
+            /* Occasional random glitch jolt on the title */
             const title = document.querySelector('.neon-title');
             if (title && !reduceMotion) {
                 setInterval(() => {
@@ -1156,12 +871,10 @@
                     }
                 }, 2200);
             }
-
-            /* ---------- Random HP/XP bar fluctuation ---------- */
+            /* Random HP/XP bar fluctuation */
             if (!reduceMotion) {
                 document.querySelectorAll('.stat-fill').forEach(bar => {
                     const MIN = 25, MAX = 100;
-
                     function wander() {
                         const target = rand(MIN, MAX);
                         const duration = rand(1.2, 2.6);
@@ -1169,8 +882,6 @@
                         bar.style.width = target.toFixed(1) + '%';
                         setTimeout(wander, duration * 1000 + rand(500, 1800));
                     }
-
-                    // let the initial fill-up animation play, then take over
                     setTimeout(() => {
                         bar.style.width = getComputedStyle(bar).width;
                         bar.style.animation = 'none';
@@ -1178,14 +889,11 @@
                     }, 2200 + rand(0, 900));
                 });
             }
-
-            /* ---------- Hide decorative PNGs whose images aren't added yet ---------- */
+            /* Hide decorative PNGs whose images aren't added yet */
             document.querySelectorAll('.float-png, .corner-png, .screen-float img, .spider-rig img, .press-start img').forEach(img => {
                 img.addEventListener('error', () => { img.style.display = 'none'; });
             });
         })();
     </script>
-
 </body>
-
 </html>

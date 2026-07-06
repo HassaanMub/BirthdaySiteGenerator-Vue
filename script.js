@@ -1,13 +1,16 @@
 const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
-
 /* ============================================================
    THEME DEFINITIONS
    Themes are plain JS objects. Their values replace the
-   {{PRIMARY}} / {{SECONDARY}} / {{BACKGROUND}} / {{SURFACE}} /
-   {{TEXT}} / {{ACCENT}} / {{GLOW}} placeholders inside templates.
-   ============================================================ */
+   - {{PRIMARY}}
+   - {{SECONDARY}}
+   - {{BACKGROUND}}
+   - {{SURFACE}}
+   - {{TEXT}}
+   - {{ACCENT}}
+   - {{GLOW}} 
+   placeholders inside templates. */
 const THEMES = {
-  // Special option: resolves to the selected template's original hardcoded
   // palette (see TEMPLATE_DEFAULT_COLORS) instead of a fixed color set.
   original: { name: 'Default Template Colors', emoji: '🎨', primary: '#ff5d73', secondary: '#ff8e72', accent: '#ffd166', background: '#ff6b81', surface: '#ffffff', text: '#333333' },
   pink: { name: 'Pink', emoji: '🌸', primary: '#e84393', secondary: '#fd79a8', accent: '#fdcb6e', background: '#fff0f5', surface: '#ffffff', text: '#4a2c3a' },
@@ -20,14 +23,12 @@ const THEMES = {
   red: { name: 'Red', emoji: '❤️', primary: '#e74c3c', secondary: '#ff7675', accent: '#fdcb6e', background: '#fff0f0', surface: '#ffffff', text: '#5a1a1a' },
   green: { name: 'Green', emoji: '💚', primary: '#27ae60', secondary: '#55efc4', accent: '#fdcb6e', background: '#f0faf0', surface: '#ffffff', text: '#1a3a1a' },
 };
-
 /* ============================================================
    TEMPLATE DEFINITIONS
    Each id maps to a self-contained file:
    templates/<id>/<id>.html  (CSS + JS live inside the HTML).
    To add a new template: create the folder + file, then
-   register it here. Nothing else needs to change.
-   ============================================================ */
+   register it here. Nothing else needs to change. */
 const TEMPLATES = {
   default: { id: 'default', name: 'Default', emoji: '🎈', description: 'Warm, playful, classic card', supportedThemes: ['pink', 'blue', 'purple', 'light', 'red', 'green'] },
   glassy: { id: 'glassy', name: 'Glassy', emoji: '🫧', description: 'Frosted glass, bubbles, ambient light', supportedThemes: ['blue', 'purple', 'dark', 'light'] },
@@ -35,26 +36,17 @@ const TEMPLATES = {
   romantic: { id: 'romantic', name: 'Romantic', emoji: '💌', description: 'Storybook with a click-to-open cover', supportedThemes: ['pink', 'red', 'purple', 'light'] },
 };
 
-// Projects saved before this architecture may reference old template ids
-const LEGACY_TEMPLATES = { cute: 'default', elegant: 'glassy' };
-
 const DEFAULT_TEMPLATE_ID = 'default';
 const DEFAULT_THEME_ID = 'pink';
 
-/* ============================================================
-   TEMPLATE LOADING + PLACEHOLDER REPLACEMENT
-   ============================================================ */
-
 // shown when a project has no uploaded photo
 const PLACEHOLDER_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-
 const templateService = {
   resolveId(templateId) {
     if (TEMPLATES[templateId]) return templateId;
     if (LEGACY_TEMPLATES[templateId]) return LEGACY_TEMPLATES[templateId];
     return DEFAULT_TEMPLATE_ID;
   },
-
   // Always fetched fresh so edits to template files show up
   // on the next preview/export without restarting the app.
   async load(templateId) {
@@ -70,12 +62,10 @@ const templateService = {
     return res.text();
   },
 };
-
 /* ============================================================
    ORIGINAL TEMPLATE PALETTES
    The exact colors each template shipped with before its :root
-   was tokenized — used by the "Default Template Colors" theme.
-   ============================================================ */
+   was tokenized — used by the "Default Template Colors" theme. */
 const TEMPLATE_DEFAULT_COLORS = {
   default: { primary: '#ff5d73', secondary: '#ff8e72', accent: '#ffd166', background: '#ff6b81', surface: '#ffffff', text: '#333333' },
   glassy: { primary: '#5cc8ff', secondary: '#9ee8ff', accent: '#9ee8ff', background: '#0f1626', surface: '#ffffff', text: '#ffffff' },
@@ -94,7 +84,7 @@ function resolveTheme(themeId, templateId) {
   }
   return THEMES[themeId] || THEMES[DEFAULT_THEME_ID];
 }
-
+// Date Format
 function formatBirthdayDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00');
@@ -111,13 +101,10 @@ function formatBirthdayDate(dateStr) {
  *   preview → base64 data URL, export → "assets/images/photo.png"
  */
 function replacePlaceholders(content, project, theme, options = {}) {
-  const imageSrc = options.imageSrc !== undefined && options.imageSrc !== null && options.imageSrc !== ''
-    ? options.imageSrc
-    : (project.image || PLACEHOLDER_IMAGE);
-
+  const imageSrc = options.imageSrc !== undefined && options.imageSrc !== null && options.imageSrc !== '' ? options.imageSrc : (project.image || PLACEHOLDER_IMAGE);
   const values = {
     NAME: project.name || '',
-    MESSAGE: project.message || 'Wishing you the happiest of birthdays!',
+    MESSAGE: project.message || 'Wishing you the Happiest Birthday!',
     DATE: formatBirthdayDate(project.birthdayDate),
     TITLE: 'Happy Birthday ' + (project.name || '') + '!',
     IMAGE: imageSrc,
@@ -129,42 +116,29 @@ function replacePlaceholders(content, project, theme, options = {}) {
     ACCENT: theme.accent || theme.secondary,
     GLOW: theme.glow || theme.primary,
   };
-
   return content.replace(/\{\{\s*([A-Z0-9_]+)\s*\}\}/g, (match, key) =>
     Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match
   );
 }
-
 /*
  * Templates live in templates/<id>/ and reference shared images as
  * "../../assets/...". Previews render from the app root and exports
- * put assets/ next to index.html, so both need the prefix flattened.
- */
+ * put assets/ next to index.html, so both need the prefix flattened. */
 function rewriteAssetPaths(html) {
   return html.replaceAll('../../assets/', 'assets/');
 }
-
 /* ============================================================
-   EXPORT SERVICE - packs the processed template into a ZIP
-   ============================================================ */
+   EXPORT SERVICE - packs the processed template into a ZIP  */
 const exportService = {
-
   async exportZIP(project) {
     const theme = resolveTheme(project.theme, project.template);
     const raw = await templateService.load(project.template);
-
-    let html = replacePlaceholders(raw, project, theme, {
-      imageSrc: project.image ? 'assets/images/photo.png' : PLACEHOLDER_IMAGE,
-    });
-
+    let html = replacePlaceholders(raw, project, theme, { imageSrc: project.image ? 'assets/images/photo.png' : PLACEHOLDER_IMAGE, });
     const zip = new JSZip();
-
     // Bundle every shared asset the template references
     // (decorative PNGs, background images, ...) so the exported
     // site works standalone.
-    const assetPaths = [...new Set(
-      [...html.matchAll(/\.\.\/\.\.\/assets\/([^"')]+)/g)].map(m => m[1])
-    )];
+    const assetPaths = [...new Set([...html.matchAll(/\.\.\/\.\.\/assets\/([^"')]+)/g)].map(m => m[1]))];
     for (const path of assetPaths) {
       try {
         const res = await fetch('assets/' + path);
@@ -173,49 +147,38 @@ const exportService = {
         console.warn('Skipping missing asset:', path);
       }
     }
-
     html = rewriteAssetPaths(html);
     zip.file('index.html', html);
-
     if (project.image) {
       const base64Data = project.image.split(',')[1] || project.image;
       zip.folder('assets').folder('images').file('photo.png', base64Data, { base64: true });
     }
-
     const blob = await zip.generateAsync({ type: 'blob' });
     saveAs(blob, 'BirthdayProject.zip');
     return true;
   },
 };
 
-/* ============================================================
-   INDEXEDDB SERVICE
-   ============================================================ */
+// INDEXEDDB SERVICE
 const DB_NAME = 'BirthdayGeneratorDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'projects';
-
 const dbService = {
   db: null,
-
   async init() {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        }
+        if (!db.objectStoreNames.contains(STORE_NAME)) { db.createObjectStore(STORE_NAME, { keyPath: 'id' }); }
       };
       req.onsuccess = (e) => { this.db = e.target.result; resolve(this.db); };
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   _tx(mode) {
     return this.db.transaction(STORE_NAME, mode).objectStore(STORE_NAME);
   },
-
   create(project) {
     return new Promise((resolve, reject) => {
       const req = this._tx('readwrite').add(project);
@@ -223,7 +186,6 @@ const dbService = {
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   read(id) {
     return new Promise((resolve, reject) => {
       const req = this._tx('readonly').get(id);
@@ -231,7 +193,6 @@ const dbService = {
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   readAll() {
     return new Promise((resolve, reject) => {
       const req = this._tx('readonly').getAll();
@@ -239,7 +200,6 @@ const dbService = {
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   update(project) {
     return new Promise((resolve, reject) => {
       const req = this._tx('readwrite').put(project);
@@ -247,7 +207,6 @@ const dbService = {
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   remove(id) {
     return new Promise((resolve, reject) => {
       const req = this._tx('readwrite').delete(id);
@@ -255,7 +214,6 @@ const dbService = {
       req.onerror = (e) => reject(e.target.error);
     });
   },
-
   clear() {
     return new Promise((resolve, reject) => {
       const req = this._tx('readwrite').clear();
@@ -265,9 +223,7 @@ const dbService = {
   },
 };
 
-/* ============================================================
-   VUE APP
-   ============================================================ */
+// VUE APP
 createApp({
   setup() {
     const currentView = ref('dashboard');
@@ -280,16 +236,14 @@ createApp({
     const editingId = ref(null);
     const isDirty = ref(false);
     const previewProjectData = ref(null);
-
     const form = reactive({
       name: '', birthdayDate: '', message: '', theme: DEFAULT_THEME_ID,
       template: DEFAULT_TEMPLATE_ID, image: null,
     });
-
     const themes = Object.entries(THEMES).map(([id, t]) => ({ id, ...t }));
     const templates = Object.values(TEMPLATES);
-
-    /* ---- Toast ---- */
+    
+    // Toast
     function showToast(message, type = 'info') {
       const icons = { success: '✅', error: '❌', info: '💡' };
       const id = Date.now() + Math.random();
@@ -299,31 +253,26 @@ createApp({
       }, 3000);
     }
 
-    /* ---- Date helpers ---- */
+    // Date helpers
     function formatDate(ts) {
       if (!ts) return '';
       const d = new Date(ts);
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
-
-    function uid() {
-      return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    }
-
-    /* ---- Load projects ---- */
+    function uid() { return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    // Load projects
     async function loadProjects() {
       loading.value = true; loadingText.value = 'Loading projects...';
       try {
         projects.value = await dbService.readAll();
         projects.value.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       } catch (e) {
-        showToast('Failed to load projects', 'error');
+        showToast('Failed to Load Projects', 'error');
       } finally {
         loading.value = false;
       }
     }
-
-    /* ---- Navigation ---- */
+    // Navigation
     function goDashboard() {
       if (isDirty.value && currentView.value === 'editor') {
         if (!confirm('You have unsaved changes. Leave anyway?')) return;
@@ -332,7 +281,6 @@ createApp({
       isDirty.value = false;
       loadProjects();
     }
-
     function newProject() {
       editingId.value = null;
       form.name = ''; form.birthdayDate = ''; form.message = '';
@@ -340,7 +288,6 @@ createApp({
       isDirty.value = false;
       currentView.value = 'editor';
     }
-
     async function openProject(id) {
       loading.value = true; loadingText.value = 'Opening project...';
       const p = await dbService.read(id);
@@ -353,7 +300,6 @@ createApp({
       isDirty.value = false;
       currentView.value = 'editor';
     }
-
     async function previewProject(id) {
       loading.value = true; loadingText.value = 'Loading preview...';
       const p = await dbService.read(id);
@@ -362,7 +308,6 @@ createApp({
       previewProjectData.value = p;
       currentView.value = 'preview';
     }
-
     function previewFromEditor() {
       previewProjectData.value = {
         id: editingId.value || 'draft',
@@ -372,7 +317,6 @@ createApp({
       };
       currentView.value = 'preview';
     }
-
     function editFromPreview() {
       if (previewProjectData.value && previewProjectData.value.id !== 'draft') {
         openProject(previewProjectData.value.id);
@@ -380,13 +324,12 @@ createApp({
         currentView.value = 'editor';
       }
     }
-
-    /* ---- Selectors ---- */
+    // Selectors
     function selectTheme(id) { form.theme = id; markDirty(); }
     function selectTemplate(id) { form.template = id; markDirty(); }
     function markDirty() { isDirty.value = true; }
 
-    /* ---- Image upload ---- */
+    // Image Upload
     function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -399,19 +342,16 @@ createApp({
       reader.readAsDataURL(file);
       e.target.value = '';
     }
-
     function removeImage() { form.image = null; markDirty(); }
-
-    /* ---- Save ---- */
+    
+    // Save
     async function saveProject() {
       if (!form.name.trim()) {
         showToast('Please enter a name', 'error');
         return;
       }
       loading.value = true; loadingText.value = 'Saving project...';
-
       const now = new Date().toISOString();
-
       if (editingId.value) {
         const existing = await dbService.read(editingId.value);
         const updated = {
@@ -433,12 +373,10 @@ createApp({
         editingId.value = project.id;
         showToast('Project created!', 'success');
       }
-
       isDirty.value = false;
       loading.value = false;
       await loadProjects();
     }
-
     async function saveAndExport() {
       await saveProject();
       if (editingId.value) {
@@ -446,7 +384,7 @@ createApp({
       }
     }
 
-    /* ---- Export ---- */
+    // Export
     async function exportProject(id) {
       loading.value = true; loadingText.value = 'Generating ZIP...';
       try {
@@ -458,47 +396,44 @@ createApp({
         }
         if (!project) { showToast('Project not found', 'error'); loading.value = false; return; }
         await exportService.exportZIP(project);
-        showToast('Exported successfully! Check your downloads.', 'success');
+        showToast('Exported Successfully! Check Your Downloads.', 'success');
       } catch (e) {
-        showToast('Export failed: ' + e.message, 'error');
+        showToast('Export Failed: ' + e.message, 'error');
       } finally {
         loading.value = false;
       }
     }
 
-    /* ---- Delete ---- */
+    // Delete
     function confirmDelete(project) {
       deleteTarget.value = project;
       showDeleteModal.value = true;
     }
-
     async function deleteProject() {
       if (!deleteTarget.value) return;
       loading.value = true; loadingText.value = 'Deleting...';
       try {
         await dbService.remove(deleteTarget.value.id);
-        showToast('Project deleted', 'success');
+        showToast('Project Deleted', 'success');
         showDeleteModal.value = false;
         deleteTarget.value = null;
         await loadProjects();
       } catch (e) {
-        showToast('Delete failed', 'error');
+        showToast('Delete Failed', 'error');
       } finally {
         loading.value = false;
       }
     }
-
     /* ============================================================
        PREVIEW - loads the real template file, replaces
        placeholders, and feeds the result to the iframe srcdoc.
        The template file is refetched only when the selected
-       template changes; typing just re-runs the string replace.
-       ============================================================ */
+       template changes; typing just re-runs the string replace.  */
     const editorTemplateHtml = ref('');
     watch(() => form.template, async (id) => {
       try {
         const html = await templateService.load(id);
-        if (form.template !== id) return;   // a newer selection won the race
+        if (form.template !== id) return;
         editorTemplateHtml.value = html;
       } catch (e) {
         if (form.template !== id) return;
@@ -507,7 +442,7 @@ createApp({
       }
     }, { immediate: true });
 
-    /* ---- Live Preview HTML (for editor iframe) ---- */
+    // Live Preview HTML
     const livePreviewHtml = computed(() => {
       if (!editorTemplateHtml.value) return '';
       const theme = resolveTheme(form.theme, form.template);
@@ -515,13 +450,13 @@ createApp({
       return rewriteAssetPaths(html);
     });
 
-    /* ---- Preview page HTML ---- */
+    // Preview page HTML
     const previewTemplateHtml = ref('');
     watch(previewProjectData, async (p) => {
       if (!p) { previewTemplateHtml.value = ''; return; }
       try {
         const html = await templateService.load(p.template);
-        if (previewProjectData.value !== p) return;   // preview changed mid-fetch
+        if (previewProjectData.value !== p) return;
         previewTemplateHtml.value = html;
       } catch (e) {
         if (previewProjectData.value !== p) return;
@@ -529,7 +464,6 @@ createApp({
         showToast(e.message, 'error');
       }
     });
-
     const previewHtml = computed(() => {
       const p = previewProjectData.value;
       if (!p || !previewTemplateHtml.value) return '';
@@ -538,16 +472,13 @@ createApp({
       return rewriteAssetPaths(html);
     });
 
-    /* ---- Init ---- */
+    // Init
     onMounted(async () => {
       try {
         await dbService.init();
         await loadProjects();
-      } catch (e) {
-        showToast('Failed to initialize database', 'error');
-      }
+      } catch (e) { showToast('Failed to initialize database', 'error');}
     });
-
     return {
       currentView, projects, loading, loadingText, toasts,
       showDeleteModal, deleteTarget, editingId, isDirty,
