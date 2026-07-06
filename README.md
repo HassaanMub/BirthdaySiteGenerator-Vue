@@ -2,43 +2,47 @@
 
 A modern, browser-based **Birthday Website Generator** built with **Vue 3**, **IndexedDB**, **JSZip**, and **FileSaver.js**.
 
-This application allows users to create personalized birthday websites without requiring a backend or database server. Projects are stored locally in the browser using **IndexedDB** and can be exported as fully functional static websites containing HTML, CSS, JavaScript, and optional images.
+Create personalized birthday websites without a backend or database server. Projects are stored locally in the browser using **IndexedDB**, rendered from real, file-based **templates**, and exported as fully functional standalone websites.
 
 ---
 
 # 📖 Table of Contents
 
-* Overview
-* Features
-* Technologies Used
-* Application Flow
-* Project Structure
-* How It Works
-* Themes
-* Templates
-* Export System
-* Data Storage
-* Screenshots
-* Future Improvements
-* Running the Project
-* License
+* [Overview](#-overview)
+* [Features](#-features)
+* [Technologies Used](#-technologies-used)
+* [Project Structure](#-project-structure)
+* [Template System](#-template-system)
+* [Placeholders Reference](#-placeholders-reference)
+* [Themes](#-themes)
+* [Templates](#-templates)
+* [Export System](#-export-system)
+* [Data Storage](#-data-storage)
+* [Adding a New Template](#-adding-a-new-template)
+* [Screenshots](#-screenshots)
+* [Running the Project](#-running-the-project)
+* [Future Improvements](#-future-improvements)
+* [Contributing](#-contributing)
+* [License](#-license)
 
 ---
 
 # 🎉 Overview
 
-Birthday Website Generator is a lightweight web application that allows users to generate beautiful birthday websites for friends and family.
+Birthday Website Generator is a lightweight web application that lets you build beautiful birthday websites for friends and family.
 
-Users can:
+You can:
 
 * Create multiple birthday website projects
-* Customize themes and templates
-* Upload an image
-* Add birthday details and a custom message
-* Preview the generated website live
-* Export the project as a standalone website
+* Pick from four hand-crafted templates, each with its own animations
+* Recolor any template with color themes — or keep its original palette
+* Upload a photo of the birthday person
+* Add a name, date, and a custom message
+* Watch the result update live while editing
+* Preview the final site full-screen
+* Export the project as a standalone website in a ZIP
 
-The exported website can be hosted anywhere (GitHub Pages, Netlify, Vercel, Hostinger, etc.) without requiring Vue or any additional dependencies.
+The exported website is plain HTML — it can be hosted anywhere (GitHub Pages, Netlify, Vercel, Hostinger, etc.) with no dependencies on Vue or the generator itself.
 
 ---
 
@@ -47,310 +51,238 @@ The exported website can be hosted anywhere (GitHub Pages, Netlify, Vercel, Host
 ### Dashboard
 
 * Create unlimited birthday projects
-* View all saved projects
-* Edit existing projects
-* Delete projects
-* Preview projects
-* Export projects
+* View all saved projects as cards with thumbnail, template, theme, and last-edited date
+* Open, preview, export, or delete any project
 
-### Project Editor
+### Editor
 
-* Birthday person's name
-* Birthday date
-* Personal birthday message
-* Theme selection
-* Template selection
-* Image upload
-* Live preview
+* Two-column, full-width layout: form on the left, **live preview** on the right
+* The live preview is pinned at viewport height and re-renders on every keystroke
+* Theme and template pickers with instant feedback
+* Image upload (stored as Base64, max ~2 MB)
+* Unsaved-changes guard when leaving the editor
 
 ### Preview
 
-* Real-time website rendering
-* Full page preview
-* Return to editor
-* Export directly
+* Full-screen preview that fills everything below the toolbar
+* Edit and Export ZIP actions right on the toolbar
 
-### Export
+### Templates & Theming
 
-Generates a ZIP containing:
-
-```text
-BirthdayProject.zip
-
-│
-├── index.html
-├── style.css
-├── script.js
-└── assets/
-    └── images/
-        └── photo.jpg (optional)
-```
-
-The exported website works completely offline.
+* Templates are real, self-contained HTML files - not generated strings
+* Every template is wired with `{{ PLACEHOLDER }}` tokens for both content and colors
+* A special **Default Template Colors** theme restores each template's original hardcoded palette
+* All template animations live inside the template file itself - edit the file, and previews **and** exports pick the change up immediately
 
 ---
 
 # 🛠 Technologies Used
 
-* Vue 3 (CDN Version)
-* IndexedDB
-* JSZip
-* FileSaver.js
-* HTML5
-* CSS3
-* JavaScript (ES6)
+| Technology | Purpose |
+|---|---|
+| **Vue 3** (CDN, no build step) | UI, reactivity, live preview |
+| **IndexedDB** | Local project storage (CRUD) |
+| **JSZip** | Building the export ZIP |
+| **FileSaver.js** | Triggering the ZIP download |
+| **Vanilla CSS** | App styling (`style.css`) |
 
-No backend is required.
-
----
-
-# 🔄 Application Flow
-
-```text
-Application Starts
-        │
-        ▼
-Initialize IndexedDB
-        │
-        ▼
-Load Saved Projects
-        │
-        ▼
-Dashboard
-        │
-        ├─────────────► Create New Project
-        │                     │
-        │                     ▼
-        │               Project Editor
-        │                     │
-        │                     ▼
-        │             Live Preview Updates
-        │                     │
-        │                     ▼
-        │                 Save Project
-        │                     │
-        │                     ▼
-        │                IndexedDB Storage
-        │
-        ▼
-Open Existing Project
-        │
-        ▼
-Preview
-        │
-        ▼
-Export ZIP
-```
+No bundler, no npm install, no backend.
 
 ---
 
 # 📂 Project Structure
 
-Although the application exists as a single HTML file, it is logically divided into modules.
-
-```text
-Birthday Website Generator
-
-│
-├── HTML Layout
-│
-├── CSS
-│   ├── Reset
-│   ├── Layout
-│   ├── Dashboard
-│   ├── Editor
-│   ├── Preview
-│   ├── Components
-│   └── Responsive Design
-│
-├── Theme Definitions
-│
-├── Template Definitions
-│
-├── IndexedDB Service
-│
-├── Export Service
-│
-├── Vue Application
-│
-├── Live Preview Generator
-│
-└── ZIP Export
 ```
+BG-App/
+├── index.html              # App shell (Vue templates for all views)
+├── style.css               # App styling
+├── script.js               # Themes, templates registry, IndexedDB service,
+│                           # placeholder engine, export service, Vue app
+│
+├── templates/              # One folder per website template
+│   ├── default/default.html
+│   ├── glassy/glassy.html
+│   ├── gaming/gaming.html
+│   └── romantic/romantic.html
+│
+├── assets/
+│   └── images/             # Shared decorative PNGs used by the templates
+│
+└── ReadmeScreenshots/
+```
+
+Each template is a **single self-contained HTML file** — its CSS and JS live inside it. There are no separate per-template stylesheets or scripts.
+
+---
+
+# 🧩 Template System
+
+The heart of the app. When you preview or export a project:
+
+1. The app fetches `templates/<id>/<id>.html` for the project's template (always fresh — file edits show up on the next preview).
+2. `replacePlaceholders(content, project, theme)` swaps every `{{ TOKEN }}` in the file for project data and theme colors.
+3. Asset paths (`../../assets/...`) are rewritten so images resolve correctly in the preview iframe and in the exported site.
+4. **Preview:** the processed HTML is fed into an `<iframe srcdoc>`. The photo is injected as its Base64 data URL.
+5. **Export:** the processed HTML becomes `index.html` in a ZIP, the photo becomes `assets/images/photo.png`, and every decorative image the template references is bundled alongside it.
+
+Old projects saved with legacy template ids (`cute`, `elegant`) are transparently mapped to current templates.
+
+---
+
+# 🏷 Placeholders Reference
+
+Templates can use any of these tokens (spaces inside the braces are optional - `{{NAME}}` and `{{ NAME }}` both work):
+
+### Content
+
+| Token | Replaced with |
+|---|---|
+| `{{ TITLE }}` | Page title — "Happy Birthday <name>!" |
+| `{{ NAME }}` | The birthday person's name |
+| `{{ MESSAGE }}` | The custom message |
+| `{{ DATE }}` | The birthday date, formatted like "July 5, 2026" |
+| `{{ IMAGE }}` | Base64 photo in previews, `assets/images/photo.png` in exports |
+
+### Theme colors
+
+| Token | Theme field |
+|---|---|
+| `{{ PRIMARY }}` | Main color |
+| `{{ SECONDARY }}` | Softer companion color |
+| `{{ ACCENT }}` | Third color for highlights |
+| `{{ BACKGROUND }}` | Page background |
+| `{{ SURFACE }}` | Cards / panels |
+| `{{ TEXT }}` | Text color |
+| `{{ GLOW }}` | Glow effects (falls back to primary) |
+
+Unknown tokens are left untouched so typos are easy to spot.
+
+> **Note:** because the color values are placeholders, opening a template file directly in the browser shows broken colors. Templates are meant to be viewed through the app's preview, which fills everything in.
 
 ---
 
 # 🎨 Themes
 
-Themes define the color palette used throughout the generated website.
+Themes are plain JavaScript objects in `script.js` — no CSS is generated anywhere.
 
-Each theme contains:
+| Theme | Vibe |
+|---|---|
+| 🎨 **Default Template Colors** | Restores the selected template's original hardcoded palette |
+| 🌸 Pink | Soft rose |
+| 💙 Blue | Fresh sky blue |
+| 🟣 Purple | Violet |
+| 🌙 Dark | Deep navy with red/gold pops |
+| ☀️ Light | Clean mint on white |
+| 🌈 Rainbow | Dark base with vivid accents |
+| ✨ Gold | Black & gold |
+| ❤️ Red | Warm red |
+| 💚 Green | Fresh green |
 
-* Background color
-* Surface color
-* Text color
-* Primary accent
-* Secondary accent
-* Display emoji
-
-Current themes include:
-
-* Pink 🌸
-* Blue 💙
-* Purple 🟣
-* Dark 🌙
-* Light ☀️
-* Rainbow 🌈
-* Gold ✨
-* Red ❤️
-* Green 💚
-
-Adding a new theme only requires creating another object inside the `THEMES` configuration.
+**Default Template Colors** is special: it isn't a fixed palette. It resolves to the original colors of whichever template is selected (defined in `TEMPLATE_DEFAULT_COLORS` in `script.js`), so every template can always look exactly as it was designed.
 
 ---
 
 # 🖼 Templates
 
-Templates control the overall appearance of the generated website.
+| Template | Description |
+|---|---|
+| 🎈 **Default** | Warm, playful classic card - tilted polaroid frame, floating emoji, vivid gradient |
+| 🫧 **Glassy** | Frosted-glass panels over a blurred photo backdrop - rising bubbles, chrome stars, flying planes & rockets, a swinging microscope that frosts the title as it passes |
+| 🎮 **Gaming** | Dark neon HUD - pixel fonts, glitching title, typed console lines, animated HP/XP bars, a Minecraft spider on a thread, floating game PNGs |
+| 💌 **Romantic** | A storybook that opens on click - polaroid photo page, pulsing CSS heart, rising balloons, glowing corner heart |
 
-Current templates:
-
-### Cute
-
-* Rounded corners
-* Pastel colors
-* Comic-style font
-* Playful decorations
-
-### Elegant
-
-* Serif typography
-* Premium appearance
-* Minimal design
-* Gold styling
-
-### Gaming
-
-* Neon colors
-* Pixel-inspired visuals
-* Dark interface
-* Animated effects
-
-Unlike themes, templates modify the layout and styling rather than colors.
-
----
-
-# 💾 Data Storage
-
-Projects are stored locally using **IndexedDB**.
-
-Each project contains:
-
-```text
-Project
-
-• ID
-• Name
-• Birthday Date
-• Message
-• Theme
-• Template
-• Image
-• Created Date
-• Updated Date
-```
-
-No information is uploaded to any server.
-
-Everything remains inside the user's browser.
+All animation logic lives inside each template's own file.
 
 ---
 
 # 📦 Export System
 
-When exporting a project:
+Clicking **Export** produces `BirthdayProject.zip` containing a real static website:
 
-1. HTML is generated dynamically.
-2. CSS is generated based on the selected theme and template.
-3. JavaScript animations are generated.
-4. Uploaded images are copied into the ZIP.
-5. JSZip packages everything.
-6. FileSaver downloads the ZIP.
+```
+BirthdayProject.zip
+├── index.html              # The processed template (CSS + JS inside)
+└── assets/
+    └── images/
+        ├── photo.png       # The uploaded photo (if any)
+        └── ...             # Every decorative PNG the template uses
+```
 
-The exported project is completely standalone.
+* No CSS or JS files are split out — the site is one HTML file plus images.
+* Decorative images are discovered by scanning the template for `../../assets/` references, fetched, and bundled automatically.
+* Unzip and open, or drop the folder on any static host.
 
----
-
-# 🖥 Live Preview
-
-The editor contains an embedded preview powered by an iframe.
-
-Instead of creating temporary files, the application:
-
-* Generates HTML
-* Generates CSS
-* Generates JavaScript
-* Injects everything into the iframe
-* Displays the website instantly
-
-This allows users to see changes in real time before exporting.
+> Templates load icon fonts (Font Awesome) and Google Fonts from CDNs, so the exported site looks best with an internet connection.
 
 ---
 
-# 📸 Screenshots
+# 💾 Data Storage
+
+Projects live in the browser via **IndexedDB** (`BirthdayGeneratorDB` → `projects` store). Each project stores:
+
+```js
+{
+  id, name, birthdayDate, message,
+  theme,      // e.g. "pink" or "original"
+  template,   // e.g. "gaming"
+  image,      // Base64 data URL or null
+  createdAt, updatedAt
+}
+```
+
+Nothing ever leaves the browser until you export.
+
+---
+
+# ➕ Adding a New Template
+
+This is the whole point of the architecture — three steps, no app-code changes beyond one registry entry:
+
+1. Create the folder and file:
+
+   ```
+   templates/myTemplate/myTemplate.html
+   ```
+
+   Make it fully self-contained (CSS + JS inline) and use the placeholders from the reference above. Reference shared images as `../../assets/images/<file>.png`.
+
+2. Register it in `TEMPLATES` in `script.js`:
+
+   ```js
+   myTemplate: {
+     id: 'myTemplate', name: 'My Template', emoji: '🎁',
+     description: 'Something amazing',
+     supportedThemes: ['pink', 'dark'],
+   },
+   ```
+
+3. (Optional) Add its original palette to `TEMPLATE_DEFAULT_COLORS` so the **Default Template Colors** theme works for it.
+
+Done — it appears in the editor's template picker automatically.
+
+---
+
+# 📷 Screenshots
 
 ## Dashboard
 
-![Dashboard](/BG%20App/ReadmeScreenshots/dashboard.png)
+![Dashboard](ReadmeScreenshots/dashboard.png)
 
----
+## Editor with Live Preview
 
-## Project Editor
+![Editor](ReadmeScreenshots/editor.png)
 
-![Editor](/BG%20App/ReadmeScreenshots/editor.png)
----
+## Full Preview
 
-## Live Preview
-
-![Live Preview](/BG%20App/ReadmeScreenshots/previewLive.png)
----
-
-## Exported Website
-
-![Dashboard](/BG%20App/ReadmeScreenshots/dashboard.png)
----
-
-# 🚀 Future Improvements
-
-Potential features planned for future versions:
-
-* Background music support
-* Additional templates
-* Custom fonts
-* More animations
-* Confetti customization
-* GIF support
-* Video backgrounds
-* Countdown timer
-* Password-protected birthday pages
-* Shareable project links
-* Drag-and-drop editor
-* Multi-language support
-* More export formats
-* Import existing projects
-* Cloud synchronization
-* PWA (Offline Support)
+![Live Preview](ReadmeScreenshots/previewLive.png)
 
 ---
 
 # ▶ Running the Project
 
-Since the application is fully client-side:
+The app is fully client-side, but it **must be served over HTTP** — templates are loaded with `fetch()`, which browsers block on `file://`.
 
-1. Download the project.
-2. Open the HTML file in a modern browser.
-
-Or serve it locally using:
+From the project folder, run any static server:
 
 ```bash
 python -m http.server
@@ -362,17 +294,36 @@ or
 npx serve
 ```
 
-No installation is required.
+or use the **Live Server** extension in VS Code, then open `index.html` in the browser.
+
+No installation, build step, or backend required.
+
+---
+
+# 🚀 Future Improvements
+
+* Background music support
+* Additional templates
+* Custom fonts
+* Confetti customization
+* GIF support
+* Video backgrounds
+* Countdown timer
+* Password-protected birthday pages
+* Shareable project links
+* Drag-and-drop editor
+* Multi-language support
+* Import existing projects
+* Cloud synchronization
+* PWA (offline support)
 
 ---
 
 # 🤝 Contributing
 
-Contributions are welcome.
+Contributions are welcome!
 
-Ideas, bug fixes, UI improvements, new templates, animations, and feature additions are greatly appreciated.
-
-Feel free to fork the project and submit a Pull Request.
+Ideas, bug fixes, UI improvements, new templates, animations, and feature additions are greatly appreciated. Feel free to fork the project and submit a Pull Request.
 
 ---
 
