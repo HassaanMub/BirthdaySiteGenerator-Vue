@@ -4,6 +4,10 @@ A modern, browser-based **Birthday Website Generator** built with **Vue 3**, **I
 
 Create personalized birthday websites without a backend or database server. Projects are stored locally in the browser using **IndexedDB**, rendered from real, file-based **templates**, and exported as fully functional standalone websites.
 
+## 🚀 Live Demo
+
+🌐 `https://hassaanmub.github.io/BirthdaySiteGenerator-Vue/index.html`
+
 ---
 
 # 📖 Table of Contents
@@ -280,7 +284,7 @@ Done — it appears in the editor's template picker automatically.
 
 # ▶ Running the Project
 
-The app is fully client-side, but it **must be served over HTTP** — templates are loaded with `fetch()`, which browsers block on `file://`.
+The app is fully client-side, but it **must be served over HTTP** - templates are loaded with `fetch()`, which browsers block on `file://`.
 
 From the project folder, run any static server:
 
