@@ -6,7 +6,7 @@ Create personalized birthday websites without a backend or database server. Proj
 
 ## 🚀 Live Demo
 
-🌐 `https://hassaanmub.github.io/BirthdaySiteGenerator-Vue/index.html`
+🌐 https://hassaanmub.github.io/BirthdaySiteGenerator-Vue/index.html
 
 ---
 
